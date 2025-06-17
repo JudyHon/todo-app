@@ -1,7 +1,7 @@
 interface ITodo {
-    id: number,
-    text: string,
-    completed: number
+  id: number;
+  text: string;
+  completed: number;
 }
 
-export default ITodo
+export default ITodo;

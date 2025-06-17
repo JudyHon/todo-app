@@ -1,6 +1,6 @@
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { StyleSheet } from 'react-native';
-import TodoApp from './route/TodoApp/TodoApp';
+import { SafeAreaView } from "react-native-safe-area-context";
+import { StyleSheet } from "react-native";
+import TodoApp from "./route/TodoApp/TodoApp";
 
 export default function App() {
   return (
