@@ -21,13 +21,13 @@ function TodoItem(props: ITodoProps) {
                 onPress={() => toggleCompleted(task.id)}
                 style={styles.todoInner} >
                 <CheckBox
-                    checked={task.completed}
+                    checked={task.completed === 1}
                     onPress={() => toggleCompleted(task.id)}
                     containerStyle={commonStyles.transparentBackground}
                 />
                 <BodyText style={[
                     styles.todoTitle,
-                    task.completed && styles.todoCompleted
+                    task.completed ? styles.todoCompleted : {}
                 ]}>
                     {task.text}
                 </BodyText>

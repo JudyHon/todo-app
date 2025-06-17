@@ -3,21 +3,26 @@ import { StyleSheet, ScrollView } from 'react-native';
 import TodoItem from "./TodoItem";
 import ITodo from "../models/todo.model";
 
-
 interface ITodoListProps {
     tasks: Array<ITodo>;
     setTasks: (task: Array<ITodo>) => void;
+    deleteCallback?: (id: number) => void;
+    toggleCallback?: (tasks: Array<ITodo>) => void;
 }
 
-function TodoList({ tasks, setTasks }: ITodoListProps) {
+function TodoList({ tasks, setTasks, deleteCallback, toggleCallback }: ITodoListProps) {
 
     // Function to Delete Task
     function deleteTask(id: number) {
-        setTasks(tasks.filter(task => task.id !== id));
+        const newTasks = tasks.filter(task => task.id !== id);
+        setTasks(newTasks);
+        if (deleteCallback) deleteCallback(id);
     }
     // Function to Toggle Task Completion
     function toggleCompleted(id: number) {
-        setTasks(tasks.map(task => (task.id === id ? { ...task, completed: !task.completed } : task)));
+        const newTasks = tasks.map(task => (task.id === id ? { ...task, completed: task.completed ? 0 : 1 } : task));
+        setTasks(newTasks);
+        if (toggleCallback) toggleCallback(newTasks);
     }
 
     return (
