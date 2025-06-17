@@ -39,6 +39,9 @@ const commonStyles = StyleSheet.create({
     justifyEnd: {
         justifyContent: 'flex-end',
     },
+    transparentBackground: {
+        backgroundColor: 'rgba(0,0,0,0)',
+    }
 });
 
 export default commonStyles;

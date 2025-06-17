@@ -33,6 +33,14 @@ export const FONT_SIZES = {
     xxxl: normalize(30),
 };
 
+export const ICON_SIZES = {
+    xs: normalize(16),
+    sm: normalize(24),
+    md: normalize(32),
+    lg: normalize(48),
+    xl: normalize(56),
+    xxl: normalize(64),
+};
 
 type FontWeight = 'normal' | 'bold' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900';
 

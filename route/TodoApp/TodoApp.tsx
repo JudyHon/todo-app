@@ -4,6 +4,7 @@ import TodoList from "./components/TodoList";
 import { Heading } from "../../components/StyleText";
 import commonStyles from "../../styles/commonStyles";
 import Icon from "react-native-vector-icons/Feather";
+import { BORDER_RADIUS, ICON_SIZES, SPACING } from "../../utils/theme";
 
 const defaultTasks = [
     { id: 1, text: 'Doctor Appointment', completed: true },
@@ -17,7 +18,7 @@ function TodoApp() {
 
     function addTask() {
         const newTask = { id: Date.now(), text, completed: false };
-        setTasks([...tasks, newTask]);
+        setTasks([newTask, ...tasks]);
         setText('');
     }
 
@@ -41,7 +42,7 @@ function TodoApp() {
                 />
                 {text &&
                     <TouchableOpacity onPress={addTask} >
-                        <Icon name="arrow-up" size={30} color="#333" />
+                        <Icon name="arrow-up" size={ICON_SIZES.sm} color="#333" />
                     </TouchableOpacity>
                 }
             </View>
@@ -60,9 +61,9 @@ const styles = StyleSheet.create({
     textInputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 16,
-        paddingVertical: 8,
-        borderRadius: 32,
+        padding: SPACING.md,
+        paddingVertical: SPACING.sm,
+        borderRadius: BORDER_RADIUS.round,
         borderWidth: 2,
         borderColor: '#ddd',
     }

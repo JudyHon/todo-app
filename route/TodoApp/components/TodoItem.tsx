@@ -1,8 +1,11 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet, Pressable, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import ITodo from '../models/todo.model';
 import { CheckBox } from '@rneui/base';
 import Icon from 'react-native-vector-icons/Feather'
+import { BodyText } from '../../../components/StyleText';
+import commonStyles from '../../../styles/commonStyles';
+import { ICON_SIZES } from '../../../utils/theme';
 
 interface ITodoProps {
     task: ITodo;
@@ -14,23 +17,23 @@ function TodoItem(props: ITodoProps) {
     const { task, deleteTask, toggleCompleted } = props;
     return (
         <View style={styles.todoContainer}>
-            <TouchableOpacity style={{
-                flex: 1,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-            }} onPress={() => toggleCompleted(task.id)}>
+            <TouchableOpacity
+                onPress={() => toggleCompleted(task.id)}
+                style={styles.todoInner} >
                 <CheckBox
                     checked={task.completed}
                     onPress={() => toggleCompleted(task.id)}
-                    containerStyle={{ backgroundColor: 'rgba(0,0,0,0)' }}
+                    containerStyle={commonStyles.transparentBackground}
                 />
-                <Text style={[styles.todoTitle, task.completed && styles.todoCompleted]}>
+                <BodyText style={[
+                    styles.todoTitle,
+                    task.completed && styles.todoCompleted
+                ]}>
                     {task.text}
-                </Text>
+                </BodyText>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => deleteTask(task.id)}  >
-                <Icon name="trash-2" size={30} color='#333' />
+                <Icon name="trash-2" size={ICON_SIZES.sm} color='#333' />
             </TouchableOpacity>
         </View>
     );
@@ -51,6 +54,12 @@ const styles = StyleSheet.create({
     },
     todoTitle: {
         flex: 1
+    },
+    todoInner: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
     },
     todoCompleted: {
         textDecorationLine: 'line-through',

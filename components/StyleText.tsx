@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
         marginBottom: SPACING.sm,
     },
     body: {
-        fontSize: FONT_SIZES.md,
+        fontSize: FONT_SIZES.sm,
         color: COLORS.textLight,
     },
 });
