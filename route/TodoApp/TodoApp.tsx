@@ -21,6 +21,7 @@ import {
 } from "../../utils/db-service";
 import ITodo from "./models/todo.model";
 import { getData, storeData } from "../../utils/stoageHelper";
+import TodoEditModal from "./TodoEditModal";
 
 const HAS_LAUNCHED = "HAS_LAUNCHED";
 
@@ -95,11 +96,24 @@ function TodoApp() {
     }
   }
 
+  const [showEdit, setShowEdit] = useState<boolean>(false);
+  function openEdit() {
+    setShowEdit(true);
+  }
+  function closeEdit() {
+    setShowEdit(false);
+  }
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.todoListContainer}
     >
+      {showEdit && <TodoEditModal isVisible={showEdit} onClose={closeEdit} />}
+      <TouchableOpacity onPress={openEdit}>
+        <Icon name="plus" size={30} />
+      </TouchableOpacity>
+
       <Heading>TASKS</Heading>
       <TodoList
         tasks={tasks}
