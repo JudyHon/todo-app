@@ -1,9 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
+import { StyleSheet, KeyboardAvoidingView, Platform, View } from "react-native";
 import TodoList from "./components/TodoList";
 import { Heading } from "../../components/StyleText";
 import commonStyles from "../../styles/commonStyles";
-import { BORDER_RADIUS, COLORS, SPACING } from "../../utils/theme";
+import {
+  BORDER_RADIUS,
+  COLORS,
+  FONT_WEIGHTS,
+  SPACING,
+} from "../../utils/theme";
 import {
   createDBTable,
   deleteDBItem,
@@ -94,6 +99,14 @@ function TodoApp() {
     setShowEdit(false);
   }
 
+  function getDateString(): string {
+    const event = new Date();
+    const dateString = event.toDateString();
+    const a = dateString.split(" ");
+    const result = a.slice(1, 3).reverse().join(" ");
+    return result;
+  }
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -106,8 +119,16 @@ function TodoApp() {
           onSave={addTask}
         />
       )}
-
-      <Heading>TASKS</Heading>
+      <View
+        style={{ flexDirection: "row", gap: SPACING.sm, padding: SPACING.sm }}
+      >
+        <Heading>TODAY</Heading>
+        <Heading
+          style={{ color: COLORS.grey, fontWeight: FONT_WEIGHTS.medium }}
+        >
+          {getDateString()}
+        </Heading>
+      </View>
       <TodoList
         tasks={tasks}
         setTasks={setTasks}

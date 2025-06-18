@@ -30,9 +30,9 @@ export const BodyText = ({ children, style, ...props }: IStyledTextProps) => (
 
 const styles = StyleSheet.create({
   heading: {
-    fontSize: FONT_SIZES.xxl,
+    fontSize: FONT_SIZES.xxxl,
     color: COLORS.text,
-    fontWeight: FONT_WEIGHTS.medium,
+    fontWeight: FONT_WEIGHTS.bold,
     marginBottom: SPACING.sm,
   },
   subheading: {

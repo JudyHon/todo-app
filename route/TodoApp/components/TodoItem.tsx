@@ -1,11 +1,16 @@
 import React from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
 import ITodo from "../models/todo.model";
-import { CheckBox } from "@rneui/base";
-import Icon from "react-native-vector-icons/Feather";
+
+import Icon from "../../../components/Icon";
 import { BodyText } from "../../../components/StyleText";
-import commonStyles from "../../../styles/commonStyles";
-import { ICON_SIZES } from "../../../utils/theme";
+import {
+  COLORS,
+  FONT_WEIGHTS,
+  ICON_SIZES,
+  SPACING,
+} from "../../../utils/theme";
+import CheckBox from "../../../components/CheckBox";
 
 interface ITodoProps {
   task: ITodo;
@@ -24,7 +29,6 @@ function TodoItem(props: ITodoProps) {
         <CheckBox
           checked={task.completed === 1}
           onPress={() => toggleCompleted(task.id)}
-          containerStyle={commonStyles.transparentBackground}
         />
         <BodyText
           style={[styles.todoTitle, task.completed ? styles.todoCompleted : {}]}
@@ -46,14 +50,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 8,
-    padding: 8,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 12,
+    paddingVertical: SPACING.md,
+    borderBottomWidth: 1,
+    borderColor: COLORS.border,
   },
   todoTitle: {
     flex: 1,
+    color: COLORS.black,
+    fontWeight: FONT_WEIGHTS.medium,
   },
   todoInner: {
     flex: 1,
@@ -62,8 +66,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   todoCompleted: {
+    color: COLORS.greyLight,
     textDecorationLine: "line-through",
-    color: "#888",
   },
 });
 

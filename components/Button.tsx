@@ -7,7 +7,6 @@ import {
   ViewStyle,
   TextStyle,
 } from "react-native";
-import Icon from "react-native-vector-icons/Feather";
 import {
   BORDER_RADIUS,
   COLORS,
@@ -16,6 +15,7 @@ import {
   ICON_SIZES,
   SPACING,
 } from "../utils/theme";
+import Icon from "../components/Icon";
 
 interface IButtonProps {
   onPress?: () => void;
@@ -26,13 +26,13 @@ interface IButtonProps {
   iconStyle?: TextStyle;
   color?: string;
   borderRadius?: number;
-  disabled: boolean;
+  disabled?: boolean;
 }
 
 const defaultButtonProps: IButtonProps = {
   onPress: () => {},
   title: "",
-  icon: "",
+  icon: undefined,
   containerStyle: {},
   titleStyle: {},
   iconStyle: {},
