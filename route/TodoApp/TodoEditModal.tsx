@@ -1,5 +1,4 @@
 import {
-  Button,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -10,15 +9,32 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Feather";
-import { COLORS, FONT_SIZES, FONT_WEIGHTS } from "../../utils/theme";
+import {
+  COLORS,
+  FONT_SIZES,
+  FONT_WEIGHTS,
+  ICON_SIZES,
+  SPACING,
+} from "../../utils/theme";
 import commonStyles from "../../styles/commonStyles";
+import Button from "../../components/Button";
+import { useState } from "react";
 
 interface ITodoEditModalProps {
   isVisible: boolean;
   onClose: () => void;
+  onSave: (text: string) => Promise<void>;
 }
 
-function TodoEditModal({ isVisible, onClose }: ITodoEditModalProps) {
+function TodoEditModal({ isVisible, onClose, onSave }: ITodoEditModalProps) {
+  const [text, setText] = useState<string>("");
+
+  async function addTask() {
+    await onSave(text.trim());
+    setText("");
+    onClose();
+  }
+
   return (
     <Modal
       animationType="fade"
@@ -32,22 +48,33 @@ function TodoEditModal({ isVisible, onClose }: ITodoEditModalProps) {
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={commonStyles.grow}
         >
-          <TouchableOpacity style={{ alignSelf: "flex-end" }}>
-            <Icon name="x" size={30} />
+          <TouchableOpacity style={commonStyles.alignEnd} onPress={onClose}>
+            <Icon name="x" size={ICON_SIZES.md} />
           </TouchableOpacity>
-          <View style={{ flex: 1, padding: 20 }}>
+          <View style={styles.inputContainer}>
             <TextInput
+              value={text}
+              onChangeText={setText}
               placeholder="Write a new task..."
               placeholderTextColor={"#ccc"}
-              style={{
-                fontWeight: FONT_WEIGHTS.medium,
-                fontSize: FONT_SIZES.xxl,
-              }}
+              style={styles.inputText}
             />
           </View>
-          <TouchableOpacity style={{ paddingVertical: 12 }}>
-            <Button title="Save" color={COLORS.blue} />
-          </TouchableOpacity>
+          <View style={styles.buttonsContainer}>
+            {/* <Button
+              icon="clock"
+              color={COLORS.grey}
+              iconStyle={{color: COLORS.white}}
+              containerStyle={{ paddingVertical: SPACING.md }}
+            /> */}
+            <Button
+              title="Save"
+              color={COLORS.blackLight}
+              containerStyle={styles.buttonContainer}
+              disabled={!text.trim()}
+              onPress={addTask}
+            />
+          </View>
         </KeyboardAvoidingView>
       </SafeAreaView>
     </Modal>
@@ -61,5 +88,19 @@ const styles = StyleSheet.create({
     width: "100%",
     position: "absolute",
     padding: 20,
+  },
+  buttonsContainer: { flexDirection: "row", gap: SPACING.sm },
+  buttonContainer: {
+    paddingVertical: SPACING.md,
+    flex: 1,
+  },
+  inputText: {
+    fontWeight: FONT_WEIGHTS.medium,
+    fontSize: FONT_SIZES.xxl,
+  },
+  inputContainer: {
+    flex: 1,
+    padding: SPACING.sm,
+    paddingVertical: SPACING.md,
   },
 });

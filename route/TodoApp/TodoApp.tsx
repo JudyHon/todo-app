@@ -1,17 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
-import {
-  View,
-  TextInput,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
 import TodoList from "./components/TodoList";
 import { Heading } from "../../components/StyleText";
 import commonStyles from "../../styles/commonStyles";
-import Icon from "react-native-vector-icons/Feather";
-import { BORDER_RADIUS, ICON_SIZES, SPACING } from "../../utils/theme";
+import { BORDER_RADIUS, COLORS, SPACING } from "../../utils/theme";
 import {
   createDBTable,
   deleteDBItem,
@@ -22,6 +14,7 @@ import {
 import ITodo from "./models/todo.model";
 import { getData, storeData } from "../../utils/stoageHelper";
 import TodoEditModal from "./TodoEditModal";
+import Button from "../../components/Button";
 
 const HAS_LAUNCHED = "HAS_LAUNCHED";
 
@@ -61,18 +54,15 @@ function TodoApp() {
 
   // State Hooks
   const [tasks, setTasks] = useState<ITodo[]>([]);
-  const [text, setText] = useState<string>("");
 
   // === Control Tasks ===
-  async function addTask() {
+  async function addTask(text: string) {
     try {
       const newTasks = [{ id: Date.now(), text, completed: 0 }, ...tasks];
       setTasks(newTasks);
 
       const db = await getDBConnection();
       await saveDBItems(db, newTasks);
-
-      setText("");
     } catch (error) {
       console.error(error);
     }
@@ -109,10 +99,13 @@ function TodoApp() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.todoListContainer}
     >
-      {showEdit && <TodoEditModal isVisible={showEdit} onClose={closeEdit} />}
-      <TouchableOpacity onPress={openEdit}>
-        <Icon name="plus" size={30} />
-      </TouchableOpacity>
+      {showEdit && (
+        <TodoEditModal
+          isVisible={showEdit}
+          onClose={closeEdit}
+          onSave={addTask}
+        />
+      )}
 
       <Heading>TASKS</Heading>
       <TodoList
@@ -121,19 +114,12 @@ function TodoApp() {
         toggleCallback={toggleCallback}
         deleteCallback={deleteCallback}
       />
-      <View style={styles.textInputContainer}>
-        <TextInput
-          value={text}
-          onChangeText={setText}
-          placeholder="New Task"
-          style={commonStyles.grow}
-        />
-        {text && (
-          <TouchableOpacity onPress={addTask}>
-            <Icon name="arrow-up" size={ICON_SIZES.sm} color="#333" />
-          </TouchableOpacity>
-        )}
-      </View>
+      <Button
+        containerStyle={commonStyles.alignEnd}
+        onPress={openEdit}
+        icon="plus"
+        color={COLORS.blackLight}
+      />
     </KeyboardAvoidingView>
   );
 }
