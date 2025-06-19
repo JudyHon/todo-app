@@ -112,17 +112,17 @@ function TodoApp() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.todoListContainer}
     >
-      {showEdit && (
-        <TodoEditModal
-          isVisible={showEdit}
-          onClose={closeEdit}
-          onSave={addTask}
-        />
-      )}
       <View
         style={{ flexDirection: "row", gap: SPACING.sm, padding: SPACING.sm }}
       >
-        <Heading>TODAY</Heading>
+        {showEdit && (
+          <TodoEditModal
+            isVisible={showEdit}
+            onClose={closeEdit}
+            onSave={addTask}
+          />
+        )}
+        <Heading>Today</Heading>
         <Heading
           style={{ color: COLORS.grey, fontWeight: FONT_WEIGHTS.medium }}
         >

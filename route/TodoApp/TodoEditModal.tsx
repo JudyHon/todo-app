@@ -8,7 +8,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Icon from "react-native-vector-icons/Feather";
+import Icon from "../../components/Icon";
 import {
   COLORS,
   FONT_SIZES,
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "100%",
     position: "absolute",
-    padding: 20,
+    padding: SPACING.lg,
   },
   buttonsContainer: { flexDirection: "row", gap: SPACING.sm },
   buttonContainer: {

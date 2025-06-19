@@ -2,15 +2,10 @@ import React from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
 import ITodo from "../models/todo.model";
 
-import Icon from "../../../components/Icon";
 import { BodyText } from "../../../components/StyleText";
-import {
-  COLORS,
-  FONT_WEIGHTS,
-  ICON_SIZES,
-  SPACING,
-} from "../../../utils/theme";
+import { COLORS, FONT_WEIGHTS, SPACING } from "../../../utils/theme";
 import CheckBox from "../../../components/CheckBox";
+import Swipable from "./Swipable";
 
 interface ITodoProps {
   task: ITodo;
@@ -19,27 +14,32 @@ interface ITodoProps {
 }
 
 function TodoItem(props: ITodoProps) {
-  const { task, deleteTask, toggleCompleted } = props;
+  const { task } = props;
+
+  function toggleCompleted() {
+    props.toggleCompleted(task.id);
+  }
+
+  function deleteTask() {
+    props.deleteTask(task.id);
+  }
+
   return (
-    <View style={styles.todoContainer}>
-      <TouchableOpacity
-        onPress={() => toggleCompleted(task.id)}
-        style={styles.todoInner}
-      >
-        <CheckBox
-          checked={task.completed === 1}
-          onPress={() => toggleCompleted(task.id)}
-        />
-        <BodyText
-          style={[styles.todoTitle, task.completed ? styles.todoCompleted : {}]}
-        >
-          {task.text}
-        </BodyText>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => deleteTask(task.id)}>
-        <Icon name="trash-2" size={ICON_SIZES.sm} color="#333" />
-      </TouchableOpacity>
-    </View>
+    <Swipable onRemove={deleteTask}>
+      <View style={styles.todoContainer}>
+        <TouchableOpacity onPress={toggleCompleted} style={styles.todoInner}>
+          <CheckBox checked={task.completed === 1} onPress={toggleCompleted} />
+          <BodyText
+            style={[
+              styles.todoTitle,
+              task.completed ? styles.todoCompleted : {},
+            ]}
+          >
+            {task.text}
+          </BodyText>
+        </TouchableOpacity>
+      </View>
+    </Swipable>
   );
 }
 
@@ -53,6 +53,7 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.md,
     borderBottomWidth: 1,
     borderColor: COLORS.border,
+    backgroundColor: COLORS.white,
   },
   todoTitle: {
     flex: 1,
