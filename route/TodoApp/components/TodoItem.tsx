@@ -35,7 +35,7 @@ function TodoItem(props: ITodoProps) {
               task.completed ? styles.todoCompleted : {},
             ]}
           >
-            {task.text}
+            {task.name}
           </BodyText>
         </TouchableOpacity>
       </View>

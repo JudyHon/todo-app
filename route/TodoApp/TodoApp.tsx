@@ -12,8 +12,10 @@ import {
 import {
   createDBTable,
   deleteDBItem,
-  getDBConnection,
+  deleteTable,
+  getDBItemByID,
   getDBItems,
+  getLastInsertId,
   saveDBItems,
 } from "../../utils/db-service";
 import ITodo from "./models/todo.model";
@@ -24,8 +26,8 @@ import Button from "../../components/Button";
 const HAS_LAUNCHED = "HAS_LAUNCHED";
 
 const defaultTasks = [
-  { id: 2, text: "Meeting at School", completed: 0 },
-  { id: 1, text: "Doctor Appointment", completed: 1 },
+  { id: 1, name: "Doctor Appointment", completed: 1 },
+  { id: 2, name: "Meeting at School", completed: 0 },
 ];
 
 function TodoApp() {
@@ -33,15 +35,14 @@ function TodoApp() {
   const checkLaunchedCallback = useCallback(async function () {
     try {
       const hasLaunched = await getData(HAS_LAUNCHED); // Check if it is the first app launch
-      const db = await getDBConnection();
 
       if (hasLaunched) {
         // Get the saved data
-        const storedTodoItems = await getDBItems(db);
+        const storedTodoItems = await getDBItems();
         setTasks(storedTodoItems);
       } else {
-        await createDBTable(db); // Create the new database
-        await saveDBItems(db, defaultTasks); // Show the default data
+        await createDBTable(); // Create the new database
+        await saveDBItems(defaultTasks); // Show the default data
         setTasks(defaultTasks);
         await storeData(HAS_LAUNCHED, "true");
       }
@@ -60,32 +61,44 @@ function TodoApp() {
   // State Hooks
   const [tasks, setTasks] = useState<ITodo[]>([]);
 
+  async function refreshTaskList(): Promise<void> {
+    const newTasks = await getDBItems();
+    setTasks(newTasks);
+  }
+
   // === Control Tasks ===
-  async function addTask(text: string) {
+  async function addTask(name: string) {
     try {
-      const newTasks = [{ id: Date.now(), text, completed: 0 }, ...tasks];
-      setTasks(newTasks);
+      const new_id = (await getLastInsertId()) + 1;
+      const newTask = [{ id: new_id, name, completed: 0 }];
 
-      const db = await getDBConnection();
-      await saveDBItems(db, newTasks);
+      await saveDBItems(newTask);
+      await refreshTaskList();
     } catch (error) {
       console.error(error);
     }
   }
 
-  async function toggleCallback(newTasks: ITodo[]) {
+  async function toggleCallback(id: number) {
     try {
-      const db = await getDBConnection();
-      await saveDBItems(db, newTasks);
+      const toggledTask = await getDBItemByID(id);
+      if (toggledTask) {
+        const newTask = {
+          ...toggledTask,
+          completed: toggledTask.completed ? 0 : 1,
+        };
+        await saveDBItems([newTask]);
+        await refreshTaskList();
+      }
     } catch (error) {
       console.error(error);
     }
   }
 
-  async function deleteCallback(deletedTaskId: number) {
+  async function deleteCallback(id: number) {
     try {
-      const db = await getDBConnection();
-      await deleteDBItem(db, deletedTaskId);
+      await deleteDBItem(id);
+      await refreshTaskList();
     } catch (error) {
       console.error(error);
     }
