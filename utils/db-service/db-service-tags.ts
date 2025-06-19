@@ -15,14 +15,17 @@ import ITag from "../../route/TodoApp/models/tag.model";
 
 const tableName = "tags";
 
-export async function getConnection(): Promise<SQLiteDatabase> {
-  return openDatabaseAsync("todo-data.db", { useNewConnection: true });
+export async function getDBConnection(): Promise<SQLiteDatabase> {
+  const db = await openDatabaseAsync("todo-data.db", {
+    useNewConnection: true,
+  });
+  return db;
 }
 
-export async function createTable() {
-  const db = await getConnection();
+export async function createTable(): Promise<void> {
+  const db = await getDBConnection();
 
-  const tagsQuery = `
+  const query = `
     CREATE TABLE IF NOT EXISTS ${tableName} (
       id INTEGER PRIMARY KEY NOT NULL,
       name TEXT NOT NULL,
@@ -30,11 +33,11 @@ export async function createTable() {
     );
   `;
 
-  await db.runAsync(tagsQuery);
+  await db.runAsync(query);
 }
 
-export async function getItems(): Promise<ITag[]> {
-  const db = await getConnection();
+export async function getAllItems(): Promise<ITag[]> {
+  const db = await getDBConnection();
 
   try {
     const items: ITag[] = [];
@@ -58,7 +61,7 @@ interface IMaxID {
   max_id: number;
 }
 export async function getLastInsertId(): Promise<number> {
-  const db = await getConnection();
+  const db = await getDBConnection();
   const result = await db.getFirstAsync<IMaxID>(`
       SELECT MAX(id) AS max_id
       FROM ${tableName}
@@ -67,24 +70,23 @@ export async function getLastInsertId(): Promise<number> {
   return result ? result?.max_id : 0;
 }
 
-export async function saveItems(todoItems: ITag[]) {
-  const db = await getConnection();
+export async function saveItems(todoItems: ITag[]): Promise<void> {
+  const db = await getDBConnection();
   const insertQuery =
     `INSERT OR REPLACE INTO ${tableName}( id, name, color ) VALUES` +
     todoItems.map((i) => `('${i.id}', '${i.name}', '${i.color}')`).join(",");
 
-  return db.runAsync(insertQuery);
+  await db.runAsync(insertQuery);
 }
 
-export async function deleteDBItem(id: number) {
-  const db = await getConnection();
+export async function deleteItem(id: number): Promise<void> {
+  const db = await getDBConnection();
   const deleteQuery = `DELETE from ${tableName} where id = ${id}`;
   await db.runAsync(deleteQuery);
 }
 
-export const deleteTable = async () => {
-  const db = await getConnection();
+export async function deleteTable(): Promise<void> {
+  const db = await getDBConnection();
   const query = `DROP TABLE ${tableName}`;
-
   await db.runAsync(query);
-};
+}

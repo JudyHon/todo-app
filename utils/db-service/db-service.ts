@@ -1,12 +1,8 @@
-import { openDatabaseAsync, SQLiteDatabase } from "expo-sqlite";
 import * as TaskDBService from "./db-service-tasks";
 import * as TagDBService from "./db-service-tags";
 import * as TaskTagsDBService from "./db-service-task-tags";
 import ITodo from "../../route/TodoApp/models/todo.model";
-
-export async function getDBConnection(): Promise<SQLiteDatabase> {
-  return openDatabaseAsync("todo-data.db", { useNewConnection: true });
-}
+import ITag from "../../route/TodoApp/models/tag.model";
 
 export async function createTables(): Promise<void> {
   await TaskDBService.createTable();
@@ -19,6 +15,8 @@ export async function deleteTables(): Promise<void> {
   await TagDBService.deleteTable();
   await TaskTagsDBService.deleteTable();
 }
+
+// === TASK RELATED ===
 
 export async function saveTasks(tasks: ITodo[]): Promise<void> {
   await TaskDBService.saveItems(tasks);
@@ -40,6 +38,19 @@ export async function getLastInsertTaskId(): Promise<number> {
 }
 
 export async function deleteTask(id: number): Promise<void> {
-  const db = await getDBConnection();
   await TaskDBService.deleteItem(id);
+}
+
+// === TAG RELATED ===
+
+export async function saveTags(tasks: ITag[]): Promise<void> {
+  await TagDBService.saveItems(tasks);
+}
+
+export async function getAllTags(): Promise<ITag[]> {
+  const results = await TagDBService.getAllItems();
+  return results;
+}
+export async function deleteTag(id: number): Promise<void> {
+  await TagDBService.deleteItem(id);
 }

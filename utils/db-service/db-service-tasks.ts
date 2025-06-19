@@ -62,7 +62,7 @@ export async function getItemByID(id: number): Promise<ITodo | null> {
 export async function getAllItems(): Promise<ITodo[]> {
   const db = await getDBConnection();
   try {
-    const todoItems: ITodo[] = [];
+    const items: ITodo[] = [];
     const results: ITodo[] = await db.getAllAsync(`
             SELECT 
                 id, name, completed
@@ -72,12 +72,12 @@ export async function getAllItems(): Promise<ITodo[]> {
         `);
 
     for (const result of results) {
-      todoItems.push(result);
+      items.push(result);
     }
-    return todoItems;
+    return items;
   } catch (error) {
     console.error(error);
-    throw Error("Failed to get todoItems !!!");
+    throw Error("Failed to get items !!!");
   }
 }
 
@@ -114,6 +114,5 @@ export async function deleteItem(id: number): Promise<void> {
 export async function deleteTable(): Promise<void> {
   const db = await getDBConnection();
   const query = `DROP TABLE ${tableName}`;
-
   await db.runAsync(query);
 }
