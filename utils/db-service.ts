@@ -128,7 +128,6 @@ export async function getLastInsertId(): Promise<number> {
 
 export async function saveDBItems(todoItems: ITodo[]) {
   const db = await getDBConnection();
-  console.log({ todoItems });
   const insertQuery =
     `INSERT OR REPLACE INTO ${tasksTableName}( id, name, completed ) VALUES` +
     todoItems

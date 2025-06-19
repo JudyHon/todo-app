@@ -30,10 +30,23 @@ const defaultTasks = [
   { id: 2, name: "Meeting at School", completed: 0 },
 ];
 
+const testData = Array.from({ length: 15 }, (_: string, i: number) => {
+  const value = i + 1;
+  return { id: value, name: value.toString(), completed: value % 2 };
+});
+
 function TodoApp() {
   // Check Todo Database
   const checkLaunchedCallback = useCallback(async function () {
     try {
+      if (true) {
+        await deleteTable();
+        await createDBTable(); // Create the new database
+        await saveDBItems(testData); // Show the default data
+        await refreshTaskList();
+        return;
+      }
+
       const hasLaunched = await getData(HAS_LAUNCHED); // Check if it is the first app launch
 
       if (hasLaunched) {
@@ -43,7 +56,7 @@ function TodoApp() {
       } else {
         await createDBTable(); // Create the new database
         await saveDBItems(defaultTasks); // Show the default data
-        setTasks(defaultTasks);
+        await refreshTaskList();
         await storeData(HAS_LAUNCHED, "true");
       }
     } catch (error) {

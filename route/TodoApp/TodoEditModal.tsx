@@ -2,6 +2,7 @@ import {
   KeyboardAvoidingView,
   Modal,
   Platform,
+  Pressable,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -48,9 +49,9 @@ function TodoEditModal({ isVisible, onClose, onSave }: ITodoEditModalProps) {
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={commonStyles.grow}
         >
-          <TouchableOpacity style={commonStyles.alignEnd} onPress={onClose}>
+          <Pressable style={commonStyles.alignEnd} onPress={onClose}>
             <Icon name="x" size={ICON_SIZES.md} />
-          </TouchableOpacity>
+          </Pressable>
           <View style={styles.inputContainer}>
             <TextInput
               value={text}

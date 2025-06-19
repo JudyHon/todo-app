@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Pressable } from "react-native";
 import ITodo from "../models/todo.model";
 
 import { BodyText } from "../../../components/StyleText";
@@ -27,7 +27,7 @@ function TodoItem(props: ITodoProps) {
   return (
     <Swipable onRemove={deleteTask}>
       <View style={styles.todoContainer}>
-        <TouchableOpacity onPress={toggleCompleted} style={styles.todoInner}>
+        <Pressable onPress={toggleCompleted} style={styles.todoInner}>
           <CheckBox checked={task.completed === 1} onPress={toggleCompleted} />
           <BodyText
             style={[
@@ -37,7 +37,7 @@ function TodoItem(props: ITodoProps) {
           >
             {task.name}
           </BodyText>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </Swipable>
   );

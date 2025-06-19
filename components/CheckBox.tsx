@@ -1,5 +1,11 @@
 import React from "react";
-import { View, StyleSheet, TouchableOpacity, ViewStyle } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  ViewStyle,
+  Pressable,
+} from "react-native";
 import Icon from "../components/Icon";
 import {
   BORDER_RADIUS,
@@ -34,7 +40,7 @@ function CheckBox(props: ICheckBoxProps) {
 
   return (
     <View style={containerStyle}>
-      <TouchableOpacity
+      <Pressable
         onPress={onPress}
         style={[
           styles.checkBoxContainer,
@@ -51,7 +57,7 @@ function CheckBox(props: ICheckBoxProps) {
         >
           <Icon name="check" size={18} color={COLORS.white} />
         </View>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 }

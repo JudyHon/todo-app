@@ -1,6 +1,7 @@
 import { normalize } from "./dimensionUtil";
 
 export const COLORS = {
+  redLight:"#ed2939",
   blue: "#7990F8",
   green: "#46CF88",
   purple: "#BC5EAD",

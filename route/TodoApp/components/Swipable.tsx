@@ -17,16 +17,62 @@ interface ISwipable extends PropsWithChildren {
   onRemove: () => void;
 }
 
+const TOUCH_SLOP = 5;
+const TIME_TO_ACTIVATE_PAN = 100;
+
 const Swipable: React.FC<ISwipable> = ({ onRemove, children }) => {
   const swipeTranslateX = useSharedValue(0);
+  const initialTouch = useSharedValue<{
+    x: number;
+    y: number;
+    time: number;
+  } | null>(null);
+  const isDragging = useSharedValue(false);
 
   const pan = Gesture.Pan()
+    .manualActivation(true)
+    .onTouchesDown((e) => {
+      initialTouch.value = {
+        x: e.changedTouches[0].x,
+        y: e.changedTouches[0].y,
+        time: Date.now(),
+      };
+    })
+    .onTouchesMove((e, state) => {
+      if (!initialTouch.value || !e.changedTouches.length) {
+        state.fail();
+        return;
+      }
+
+      const xDiff = Math.abs(e.changedTouches[0].x - initialTouch.value.x);
+      const yDiff = Math.abs(e.changedTouches[0].y - initialTouch.value.y);
+
+      const isHorizontalPanning = xDiff > yDiff;
+
+      const isClick = xDiff < 0.5 && yDiff < 0.5;
+
+      const timeToCheck = Date.now() - initialTouch.value.time;
+
+      if (timeToCheck <= 50) {
+        if (isClick) state.fail();
+        else if (isHorizontalPanning) {
+          state.activate();
+        } else {
+          if (!isDragging.value) state.fail();
+          else state.activate();
+        }
+      }
+    })
+    .onStart((event) => {
+      isDragging.value = true;
+    })
     .onChange((event) => {
       if (event.translationX < 0) {
         swipeTranslateX.value = event.translationX;
       }
     })
     .onFinalize(() => {
+      isDragging.value = false;
       const isShouldDismiss = swipeTranslateX.value < -SCREEN_WIDTH * 0.3;
       if (isShouldDismiss) {
         swipeTranslateX.value = withTiming(
@@ -56,8 +102,8 @@ const Swipable: React.FC<ISwipable> = ({ onRemove, children }) => {
         <View style={styles.iconContainer}>
           <Icon
             name="trash-2"
-            size={ICON_SIZES.sm}
-            color={COLORS.blackLight}
+            size={ICON_SIZES.xs}
+            color={COLORS.white}
             style={styles.icon}
           />
         </View>
@@ -73,7 +119,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: "100%",
     height: "100%",
-    backgroundColor: COLORS.error,
+    backgroundColor: COLORS.redLight,
   },
   icon: { alignSelf: "flex-end", padding: SPACING.md },
 });

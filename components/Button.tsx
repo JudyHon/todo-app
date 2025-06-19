@@ -6,6 +6,7 @@ import {
   Text,
   ViewStyle,
   TextStyle,
+  Pressable,
 } from "react-native";
 import {
   BORDER_RADIUS,
@@ -58,7 +59,7 @@ function Button(props: IButtonProps) {
 
   return (
     <View style={containerStyle}>
-      <TouchableOpacity
+      <Pressable
         onPress={onPress}
         style={[
           styles.buttonContainer,
@@ -90,7 +91,7 @@ function Button(props: IButtonProps) {
             {title}
           </Text>
         )}
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 }
