@@ -72,13 +72,14 @@ export async function getLastInsertId(): Promise<number> {
   return result ? result?.max_id : 0;
 }
 
-export async function saveItems(todoItems: ITaskTags[]): Promise<void> {
+export async function saveItems(
+  task_id: number,
+  tags_ids: number[]
+): Promise<void> {
   const db = await getDBConnection();
   const insertQuery =
-    `INSERT OR REPLACE INTO ${tableName}( id, task_id, tag_id ) VALUES` +
-    todoItems
-      .map((i) => `('${i.id}', '${i.task_id}', '${i.tag_id}')`)
-      .join(",");
+    `INSERT OR REPLACE INTO ${tableName}( task_id, tag_id ) VALUES` +
+    tags_ids.map((tag_id) => `('${task_id}', '${tag_id}')`).join(",");
 
   await db.runAsync(insertQuery);
 }

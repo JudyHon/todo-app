@@ -1,7 +1,6 @@
 interface ITaskTags {
-  id: number;
-  task_id: string;
-  tag_id: string;
+  task_id: number;
+  tags_ids: number[];
 }
 
 export default ITaskTags;

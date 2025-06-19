@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
   },
   body: {
-    fontSize: FONT_SIZES.sm,
+    fontSize: FONT_SIZES.md,
     color: COLORS.textLight,
   },
 });

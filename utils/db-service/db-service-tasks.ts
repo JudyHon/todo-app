@@ -1,5 +1,6 @@
 import { openDatabaseAsync, SQLiteDatabase } from "expo-sqlite";
 import ITodo from "../../route/TodoApp/models/todo.model";
+import ITag from "../../route/TodoApp/models/tag.model";
 
 /**
  * Schema
@@ -62,17 +63,33 @@ export async function getAllItems(): Promise<ITodo[]> {
   const db = await getDBConnection();
   try {
     const items: ITodo[] = [];
-    const results: ITodo[] = await db.getAllAsync(`
-            SELECT 
-                id, name, completed
-            FROM
-                ${tableName}
-            ORDER BY id DESC
-        `);
+    const results: Array<any> = await db.getAllAsync(`
+      SELECT 
+        tasks.id,
+        tasks.name,
+        tasks.completed,
+        tasks.due_date,
+        json_group_array(
+          CASE
+            WHEN tags.id IS NOT NULL
+            THEN json_object('id', tags.id, 'name', tags.name, 'color', tags.color)
+          END
+          ) AS tags
+      FROM
+          ${tableName}
+      LEFT JOIN tasks_tag ON tasks.id = tasks_tag.task_id
+      LEFT JOIN tags ON tags.id = tasks_tag.tag_id
+      GROUP BY tasks.id
+      ORDER BY task_id DESC
+    `);
 
     for (const result of results) {
-      items.push(result);
+      const rawTags = JSON.parse(result.tags);
+      const tags = rawTags.filter((tag: ITag | null) => tag !== null);
+      const parsedResult = { ...result, tags };
+      items.push(parsedResult);
     }
+    items.sort((a, b) => b.id - a.id);
     return items;
   } catch (error) {
     console.error(error);

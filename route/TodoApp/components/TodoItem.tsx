@@ -6,6 +6,8 @@ import { BodyText } from "../../../components/StyleText";
 import { COLORS, FONT_WEIGHTS, SPACING } from "../../../utils/theme";
 import CheckBox from "../../../components/CheckBox";
 import Swipable from "./Swipable";
+import Tag from "./Tag";
+import commonStyles from "../../../styles/commonStyles";
 
 interface ITodoProps {
   task: ITodo;
@@ -29,14 +31,27 @@ function TodoItem(props: ITodoProps) {
       <View style={styles.todoContainer}>
         <Pressable onPress={toggleCompleted} style={styles.todoInner}>
           <CheckBox checked={task.completed === 1} onPress={toggleCompleted} />
-          <BodyText
-            style={[
-              styles.todoTitle,
-              task.completed ? styles.todoCompleted : {},
-            ]}
-          >
-            {task.name}
-          </BodyText>
+          <View style={[commonStyles.grow, { gap: SPACING.sm }]}>
+            <BodyText
+              style={[
+                styles.todoTitle,
+                task.completed ? styles.todoCompleted : {},
+              ]}
+            >
+              {task.name}
+            </BodyText>
+            <View style={[commonStyles.row, { gap: SPACING.xs }]}>
+              {task.tags?.map((value) => (
+                <Tag
+                  key={value.id}
+                  tagId={value.id}
+                  tagName={value.name}
+                  color={value.color}
+                  active={task.completed === 0}
+                />
+              ))}
+            </View>
+          </View>
         </Pressable>
       </View>
     </Swipable>
@@ -49,7 +64,7 @@ const styles = StyleSheet.create({
     minHeight: 30,
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     paddingVertical: SPACING.md,
     borderBottomWidth: 1,
     borderColor: COLORS.border,
@@ -64,7 +79,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
   },
   todoCompleted: {
     color: COLORS.greyLight,

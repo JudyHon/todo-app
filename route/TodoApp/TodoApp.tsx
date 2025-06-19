@@ -23,6 +23,7 @@ import {
   getTaskById,
   saveTags,
   saveTasks,
+  saveTaskTags,
 } from "../../utils/db-service/db-service";
 
 const HAS_LAUNCHED = "HAS_LAUNCHED";
@@ -49,7 +50,7 @@ function TodoApp() {
   async function initData(): Promise<void> {
     await deleteTables();
     await createTables(); // Create all database
-    await saveTasks(DEFAULT_TASKS); // Save the default tasks
+    // await saveTasks(DEFAULT_TASKS); // Save the default tasks
     await saveTags(DEFAULT_TAGS);
 
     await refreshTaskList();
@@ -97,6 +98,7 @@ function TodoApp() {
       const newTask = [{ id: new_id, name, completed: 0 }];
 
       await saveTasks(newTask);
+      await saveTaskTags(new_id, tags);
       await refreshTaskList();
     } catch (error) {
       console.error(error);
