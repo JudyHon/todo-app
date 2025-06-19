@@ -21,23 +21,22 @@ import {
   getAllTasks,
   getLastInsertTaskId,
   getTaskById,
+  saveTags,
   saveTasks,
 } from "../../utils/db-service/db-service";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getAllItems } from "../../utils/db-service/db-service-tasks";
 
 const HAS_LAUNCHED = "HAS_LAUNCHED";
 
-const defaultTasks = [
+const DEFAULT_TASKS = [
   { id: 1, name: "Doctor Appointment", completed: 1 },
   { id: 2, name: "Meeting at School", completed: 0 },
 ];
 
 const DEFAULT_TAGS = [
-  { name: "Health", color: "blue" },
-  { name: "Work", color: "green" },
-  { name: "Mental Health", color: "purple" },
-  { name: "Others", color: "grey" },
+  { id: 1, name: "Health", color: "blue" },
+  { id: 2, name: "Work", color: "green" },
+  { id: 3, name: "Mental Health", color: "purple" },
+  { id: 4, name: "Others", color: "grey" },
 ];
 
 const testData = Array.from({ length: 15 }, (_: string, i: number) => {
@@ -46,19 +45,29 @@ const testData = Array.from({ length: 15 }, (_: string, i: number) => {
 });
 
 function TodoApp() {
+  // Init Data
+  async function initData(): Promise<void> {
+    await deleteTables();
+    await createTables(); // Create all database
+    await saveTasks(DEFAULT_TASKS); // Save the default tasks
+    await saveTags(DEFAULT_TAGS);
+
+    await refreshTaskList();
+  }
+
   // Check Todo Database
   const checkLaunchedCallback = useCallback(async function () {
     try {
       const hasLaunched = await getData(HAS_LAUNCHED); // Check if it is the first app launch
 
-      if (hasLaunched) {
+      if (
+        // false &&
+        hasLaunched
+      ) {
         // Get the saved data
-        const storedTodoItems = await getAllTasks();
-        setTasks(storedTodoItems);
-      } else {
-        await createTables(); // Create the new database
-        await saveTasks(defaultTasks); // Show the default data
         await refreshTaskList();
+      } else {
+        await initData();
         await storeData(HAS_LAUNCHED, "true");
       }
     } catch (error) {
@@ -82,7 +91,7 @@ function TodoApp() {
   }
 
   // === Control Tasks ===
-  async function addTask(name: string) {
+  async function addTask(name: string, tags: number[]) {
     try {
       const new_id = (await getLastInsertTaskId()) + 1;
       const newTask = [{ id: new_id, name, completed: 0 }];

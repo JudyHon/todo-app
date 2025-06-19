@@ -11,6 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "../../components/Icon";
 import {
+  BORDER_RADIUS,
   COLORS,
   FONT_SIZES,
   FONT_WEIGHTS,
@@ -19,33 +20,67 @@ import {
 } from "../../utils/theme";
 import commonStyles from "../../styles/commonStyles";
 import Button from "../../components/Button";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Tag from "./components/Tag";
 import {
   GestureHandlerRootView,
   ScrollView,
 } from "react-native-gesture-handler";
+import ITag from "./models/tag.model";
+import { getAllTags } from "../../utils/db-service/db-service";
 
 interface ITodoEditModalProps {
   isVisible: boolean;
   onClose: () => void;
-  onSave: (text: string) => Promise<void>;
+  onSave: (task_name: string, tags: number[]) => Promise<void>;
 }
-
-const DEFAULT_TAGS = [
-  { name: "Health", color: "blue" },
-  { name: "Work", color: "green" },
-  { name: "Mental Health", color: "purple" },
-  { name: "Others", color: "grey" },
-];
 
 function TodoEditModal({ isVisible, onClose, onSave }: ITodoEditModalProps) {
   const [text, setText] = useState<string>("");
+  const [tags, setTags] = useState<ITag[]>([]);
+
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+
+  // Check Todo Database
+  const getTagsCallback = useCallback(async function () {
+    try {
+      const tags = await getAllTags();
+      setTags(tags);
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  useEffect(
+    function () {
+      getTagsCallback();
+    },
+    [getTagsCallback]
+  );
 
   async function addTask() {
-    await onSave(text.trim());
+    await onSave(text.trim(), selectedTagIds);
     setText("");
+    setSelectedTagIds([]);
     onClose();
+  }
+
+  function selectTag(tagId: number) {
+    const isExist = selectedTagIds.find((value) => value == tagId);
+    var newTags = [];
+    if (isExist) {
+      newTags = selectedTagIds.filter((value) => value !== tagId);
+    } else {
+      newTags = [...selectedTagIds, tagId];
+    }
+
+    setSelectedTagIds(newTags);
+  }
+
+  function checkSelectedTag(tagId: number): boolean {
+    const isExist = selectedTagIds.find((value) => value === tagId);
+    if (isExist) return true;
+    else return false;
   }
 
   return (
@@ -73,14 +108,25 @@ function TodoEditModal({ isVisible, onClose, onSave }: ITodoEditModalProps) {
               style={styles.inputText}
             />
           </View>
-          <GestureHandlerRootView style={{}}>
+          <GestureHandlerRootView
+            style={{ flexDirection: "row", gap: SPACING.sm }}
+          >
+            <Button
+              icon="plus"
+              borderRadius={BORDER_RADIUS.sm}
+              iconStyle={{ fontSize: ICON_SIZES.xs, color: COLORS.grey }}
+              buttonStyle={{ padding: SPACING.xs }}
+              color={COLORS.greyUltraLight}
+            />
             <ScrollView horizontal contentContainerStyle={{ gap: SPACING.sm }}>
-              {DEFAULT_TAGS.map((value, index) => (
+              {tags.map((tag) => (
                 <Tag
-                  key={index.toString()}
-                  tagName={value.name}
-                  color={value.color}
-                  disabled
+                  key={tag.id}
+                  tagId={tag.id}
+                  tagName={tag.name}
+                  color={tag.color}
+                  active={checkSelectedTag(tag.id)}
+                  onPress={selectTag}
                 />
               ))}
             </ScrollView>

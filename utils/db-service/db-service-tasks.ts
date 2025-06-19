@@ -1,6 +1,5 @@
 import { openDatabaseAsync, SQLiteDatabase } from "expo-sqlite";
 import ITodo from "../../route/TodoApp/models/todo.model";
-// import { getDBConnection } from "./db-service";
 
 /**
  * Schema

@@ -63,7 +63,7 @@ const Swipable: React.FC<ISwipable> = ({ onRemove, children }) => {
         }
       }
     })
-    .onStart((event) => {
+    .onStart(() => {
       isDragging.value = true;
     })
     .onChange((event) => {

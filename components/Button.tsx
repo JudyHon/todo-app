@@ -23,7 +23,9 @@ interface IButtonProps {
   title?: string;
   icon?: string;
   containerStyle?: ViewStyle;
+  buttonStyle?: ViewStyle;
   titleStyle?: TextStyle;
+
   iconStyle?: TextStyle;
   color?: string;
   borderRadius?: number;
@@ -35,6 +37,7 @@ const defaultButtonProps: IButtonProps = {
   title: "",
   icon: undefined,
   containerStyle: {},
+  buttonStyle: {},
   titleStyle: {},
   iconStyle: {},
   color: "",
@@ -50,6 +53,7 @@ function Button(props: IButtonProps) {
     title,
     icon,
     containerStyle,
+    buttonStyle,
     iconStyle,
     titleStyle,
     color,
@@ -63,6 +67,7 @@ function Button(props: IButtonProps) {
         onPress={onPress}
         style={[
           styles.buttonContainer,
+          buttonStyle && buttonStyle,
           color && { backgroundColor: color },
           disabled && { backgroundColor: COLORS.disableBackground },
           { borderRadius },

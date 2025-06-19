@@ -51,6 +51,7 @@ export async function getAllTags(): Promise<ITag[]> {
   const results = await TagDBService.getAllItems();
   return results;
 }
+
 export async function deleteTag(id: number): Promise<void> {
   await TagDBService.deleteItem(id);
 }

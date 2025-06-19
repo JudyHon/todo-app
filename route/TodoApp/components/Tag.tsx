@@ -1,6 +1,11 @@
 import React from "react";
-import { Text, View, StyleSheet } from "react-native";
-import { BORDER_RADIUS, COLORS, FONT_WEIGHTS, SPACING } from "../../../utils/theme";
+import { Text, View, StyleSheet, Pressable } from "react-native";
+import {
+  BORDER_RADIUS,
+  COLORS,
+  FONT_WEIGHTS,
+  SPACING,
+} from "../../../utils/theme";
 
 const COLORS_COMBINATION = [
   { name: "blue", backgroundColor: COLORS.blueLight, color: COLORS.blue },
@@ -10,47 +15,55 @@ const COLORS_COMBINATION = [
 ];
 
 interface ITagProps {
+  tagId: number;
   tagName: string;
   color: string;
-  disabled?: boolean;
-  onPress?: () => void;
+  active?: boolean;
+  onPress?: (id: number) => void;
 }
 
 const defaultTagProps: ITagProps = {
+  tagId: 0,
   tagName: "",
   color: "",
-  disabled: false,
+  active: false,
 };
 
 function Tag(props: ITagProps) {
   const propsWithDefaults = { ...defaultTagProps, ...props };
 
-  const { tagName, color, disabled, onPress } = propsWithDefaults;
+  const { tagId, tagName, color, active, onPress } = propsWithDefaults;
 
   const chosenColor = COLORS_COMBINATION.find((value) => value.name === color);
   const backgroundColor = chosenColor?.backgroundColor;
   const textColor = chosenColor?.color;
 
+  function toggleTag() {
+    onPress!(tagId);
+  }
+
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: disabled
-            ? COLORS.disableBackground
-            : backgroundColor,
-        },
-      ]}
-    >
-      <Text
+    <Pressable onPress={toggleTag}>
+      <View
         style={[
-          styles.text,
-          { color: disabled ? COLORS.disableText : textColor },
+          styles.container,
+          {
+            backgroundColor: active
+              ? backgroundColor
+              : COLORS.disableBackground,
+          },
         ]}
       >
-        {tagName.toUpperCase()}
-      </Text>
-    </View>
+        <Text
+          style={[
+            styles.text,
+            { color: active ? textColor : COLORS.disableText },
+          ]}
+        >
+          {tagName.toUpperCase()}
+        </Text>
+      </View>
+    </Pressable>
   );
 }
 
