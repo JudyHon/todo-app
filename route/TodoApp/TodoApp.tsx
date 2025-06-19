@@ -9,25 +9,35 @@ import {
   FONT_WEIGHTS,
   SPACING,
 } from "../../utils/theme";
-import {
-  createDBTable,
-  deleteDBItem,
-  deleteTable,
-  getDBItemByID,
-  getDBItems,
-  getLastInsertId,
-  saveDBItems,
-} from "../../utils/db-service";
+
 import ITodo from "./models/todo.model";
 import { getData, storeData } from "../../utils/stoageHelper";
 import TodoEditModal from "./TodoEditModal";
 import Button from "../../components/Button";
+import {
+  createTables,
+  deleteTables,
+  deleteTask,
+  getAllTasks,
+  getLastInsertTaskId,
+  getTaskById,
+  saveTasks,
+} from "../../utils/db-service/db-service";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getAllItems } from "../../utils/db-service/db-service-tasks";
 
 const HAS_LAUNCHED = "HAS_LAUNCHED";
 
 const defaultTasks = [
   { id: 1, name: "Doctor Appointment", completed: 1 },
   { id: 2, name: "Meeting at School", completed: 0 },
+];
+
+const DEFAULT_TAGS = [
+  { name: "Health", color: "blue" },
+  { name: "Work", color: "green" },
+  { name: "Mental Health", color: "purple" },
+  { name: "Others", color: "grey" },
 ];
 
 const testData = Array.from({ length: 15 }, (_: string, i: number) => {
@@ -39,23 +49,15 @@ function TodoApp() {
   // Check Todo Database
   const checkLaunchedCallback = useCallback(async function () {
     try {
-      if (true) {
-        await deleteTable();
-        await createDBTable(); // Create the new database
-        await saveDBItems(testData); // Show the default data
-        await refreshTaskList();
-        return;
-      }
-
       const hasLaunched = await getData(HAS_LAUNCHED); // Check if it is the first app launch
 
       if (hasLaunched) {
         // Get the saved data
-        const storedTodoItems = await getDBItems();
+        const storedTodoItems = await getAllTasks();
         setTasks(storedTodoItems);
       } else {
-        await createDBTable(); // Create the new database
-        await saveDBItems(defaultTasks); // Show the default data
+        await createTables(); // Create the new database
+        await saveTasks(defaultTasks); // Show the default data
         await refreshTaskList();
         await storeData(HAS_LAUNCHED, "true");
       }
@@ -75,17 +77,17 @@ function TodoApp() {
   const [tasks, setTasks] = useState<ITodo[]>([]);
 
   async function refreshTaskList(): Promise<void> {
-    const newTasks = await getDBItems();
+    const newTasks = await getAllTasks();
     setTasks(newTasks);
   }
 
   // === Control Tasks ===
   async function addTask(name: string) {
     try {
-      const new_id = (await getLastInsertId()) + 1;
+      const new_id = (await getLastInsertTaskId()) + 1;
       const newTask = [{ id: new_id, name, completed: 0 }];
 
-      await saveDBItems(newTask);
+      await saveTasks(newTask);
       await refreshTaskList();
     } catch (error) {
       console.error(error);
@@ -94,13 +96,13 @@ function TodoApp() {
 
   async function toggleCallback(id: number) {
     try {
-      const toggledTask = await getDBItemByID(id);
+      const toggledTask = await getTaskById(id);
       if (toggledTask) {
         const newTask = {
           ...toggledTask,
           completed: toggledTask.completed ? 0 : 1,
         };
-        await saveDBItems([newTask]);
+        await saveTasks([newTask]);
         await refreshTaskList();
       }
     } catch (error) {
@@ -110,7 +112,7 @@ function TodoApp() {
 
   async function deleteCallback(id: number) {
     try {
-      await deleteDBItem(id);
+      await deleteTask(id);
       await refreshTaskList();
     } catch (error) {
       console.error(error);

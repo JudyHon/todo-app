@@ -1,5 +1,6 @@
 import { openDatabaseAsync, SQLiteDatabase } from "expo-sqlite";
-import ITodo from "../route/TodoApp/models/todo.model";
+import ITodo from "../../route/TodoApp/models/todo.model";
+// import { getDBConnection } from "./db-service";
 
 /**
  * Schema
@@ -11,35 +12,23 @@ import ITodo from "../route/TodoApp/models/todo.model";
  * | PK | text | integer   | FK/null   | timestamp | text       |
  * +----+------+-----------+-----------+-----------+------------+
  *
- * tags
- * +----+------+-------+
- * | id | name | color |
- * +----+------+-------+
- * | PK | text | text  |
- * +----+------+-------+
  *
- * task_tags
- * +----+---------+--------+
- * | id | task_id | tag_id |
- * +----+---------+--------+
- * | PK | FK      | FK     |
- * +----+---------+--------+
  */
 
-const tasksTableName = "tasks";
-const tagsTableName = "tags";
-const taskTagsTableName = "tasks_tag";
+const tableName = "tasks";
 
 export async function getDBConnection(): Promise<SQLiteDatabase> {
-  return openDatabaseAsync("todo-data.db", { useNewConnection: true });
+  const db = await openDatabaseAsync("todo-data.db", {
+    useNewConnection: true,
+  });
+  return db;
 }
 
-export async function createDBTable() {
+export async function createTable(): Promise<void> {
   const db = await getDBConnection();
-
-  const tasksQuery = `
+  const query = `
     PRAGMA foreign_keys = ON;
-    CREATE TABLE IF NOT EXISTS ${tasksTableName} (
+    CREATE TABLE IF NOT EXISTS ${tableName} (
       id INTEGER PRIMARY KEY NOT NULL,
       name TEXT NOT NULL,
       completed INTEGER NOT NULL,
@@ -50,38 +39,17 @@ export async function createDBTable() {
     );
   `;
 
-  const tagsQuery = `
-    CREATE TABLE IF NOT EXISTS ${tagsTableName} (
-      id INTEGER PRIMARY KEY NOT NULL,
-      text TEXT NOT NULL,
-      completed INTEGER
-    );
-  `;
-
-  const taskTagsQuery = `
-    CREATE TABLE IF NOT EXISTS ${taskTagsTableName} (
-      id INTEGER PRIMARY KEY NOT NULL,
-      task_id INTEGER NOT NULL,
-      tag_id INTEGER,
-      FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE,
-      FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
-    );
-  `;
-
-  await db.execAsync(tasksQuery);
-  await db.runAsync(tagsQuery);
-  await db.runAsync(taskTagsQuery);
+  await db.execAsync(query);
 }
 
-export async function getDBItemByID(id: number): Promise<ITodo | null> {
+export async function getItemByID(id: number): Promise<ITodo | null> {
   const db = await getDBConnection();
-
   try {
     const result: ITodo | null = await db.getFirstAsync(`
             SELECT 
                 id, name, completed
             FROM
-                ${tasksTableName}
+                ${tableName}
             WHERE id = ${id}
         `);
     return result;
@@ -91,18 +59,18 @@ export async function getDBItemByID(id: number): Promise<ITodo | null> {
   }
 }
 
-export async function getDBItems(): Promise<ITodo[]> {
+export async function getAllItems(): Promise<ITodo[]> {
   const db = await getDBConnection();
-
   try {
     const todoItems: ITodo[] = [];
     const results: ITodo[] = await db.getAllAsync(`
             SELECT 
                 id, name, completed
             FROM
-                ${tasksTableName}
+                ${tableName}
             ORDER BY id DESC
         `);
+
     for (const result of results) {
       todoItems.push(result);
     }
@@ -120,32 +88,32 @@ export async function getLastInsertId(): Promise<number> {
   const db = await getDBConnection();
   const result = await db.getFirstAsync<IMaxID>(`
       SELECT MAX(id) AS max_id
-      FROM ${tasksTableName}
+      FROM ${tableName}
      `);
 
   return result ? result?.max_id : 0;
 }
 
-export async function saveDBItems(todoItems: ITodo[]) {
+export async function saveItems(todoItems: ITodo[]): Promise<void> {
   const db = await getDBConnection();
   const insertQuery =
-    `INSERT OR REPLACE INTO ${tasksTableName}( id, name, completed ) VALUES` +
+    `INSERT OR REPLACE INTO ${tableName}( id, name, completed ) VALUES` +
     todoItems
       .map((i) => `('${i.id}', '${i.name}', '${i.completed}')`)
       .join(",");
 
-  return db.runAsync(insertQuery);
+  await db.runAsync(insertQuery);
 }
 
-export async function deleteDBItem(id: number) {
+export async function deleteItem(id: number): Promise<void> {
   const db = await getDBConnection();
-  const deleteQuery = `DELETE from ${tasksTableName} where rowid = ${id}`;
+  const deleteQuery = `DELETE from ${tableName} where id = ${id}`;
   await db.runAsync(deleteQuery);
 }
 
-export const deleteTable = async () => {
+export async function deleteTable(): Promise<void> {
   const db = await getDBConnection();
-  const query = `DROP TABLE ${tasksTableName}`;
+  const query = `DROP TABLE ${tableName}`;
 
   await db.runAsync(query);
-};
+}

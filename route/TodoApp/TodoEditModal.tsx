@@ -20,12 +20,24 @@ import {
 import commonStyles from "../../styles/commonStyles";
 import Button from "../../components/Button";
 import { useState } from "react";
+import Tag from "./components/Tag";
+import {
+  GestureHandlerRootView,
+  ScrollView,
+} from "react-native-gesture-handler";
 
 interface ITodoEditModalProps {
   isVisible: boolean;
   onClose: () => void;
   onSave: (text: string) => Promise<void>;
 }
+
+const DEFAULT_TAGS = [
+  { name: "Health", color: "blue" },
+  { name: "Work", color: "green" },
+  { name: "Mental Health", color: "purple" },
+  { name: "Others", color: "grey" },
+];
 
 function TodoEditModal({ isVisible, onClose, onSave }: ITodoEditModalProps) {
   const [text, setText] = useState<string>("");
@@ -61,6 +73,19 @@ function TodoEditModal({ isVisible, onClose, onSave }: ITodoEditModalProps) {
               style={styles.inputText}
             />
           </View>
+          <GestureHandlerRootView style={{}}>
+            <ScrollView horizontal contentContainerStyle={{ gap: SPACING.sm }}>
+              {DEFAULT_TAGS.map((value, index) => (
+                <Tag
+                  key={index.toString()}
+                  tagName={value.name}
+                  color={value.color}
+                  disabled
+                />
+              ))}
+            </ScrollView>
+          </GestureHandlerRootView>
+
           <View style={styles.buttonsContainer}>
             {/* <Button
               icon="clock"
