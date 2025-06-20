@@ -11,6 +11,7 @@ import {
 } from "../../utils/theme";
 
 import ITodo from "./models/todo.model";
+import ITag from "./models/tag.model";
 import { getData, storeData } from "../../utils/stoageHelper";
 import TodoEditModal from "./TodoEditModal";
 import Button from "../../components/Button";
@@ -28,32 +29,47 @@ import {
 
 const HAS_LAUNCHED = "HAS_LAUNCHED";
 
-const DEFAULT_TASKS = [
-  { id: 1, name: "Doctor Appointment", completed: 1 },
-  { id: 2, name: "Meeting at School", completed: 0 },
-];
-
-const DEFAULT_TAGS = [
+const DEFAULT_TAGS: ITag[] = [
   { id: 1, name: "Health", color: "blue" },
   { id: 2, name: "Work", color: "green" },
   { id: 3, name: "Mental Health", color: "purple" },
   { id: 4, name: "Others", color: "grey" },
 ];
 
+const DEFAULT_TASKS = [
+  { id: 1, name: "Doctor Appointment", completed: 1, tags: [] },
+  { id: 2, name: "Meeting at School", completed: 0, tags: [DEFAULT_TAGS[1]] },
+];
+
 const testData = Array.from({ length: 15 }, (_: string, i: number) => {
   const value = i + 1;
-  return { id: value, name: value.toString(), completed: value % 2 };
+  return {
+    id: value,
+    name: value.toString(),
+    completed: value % 2,
+  };
 });
 
 function TodoApp() {
   // Init Data
   async function initData(): Promise<void> {
-    await deleteTables();
+    // await deleteTables();
     await createTables(); // Create all database
-    // await saveTasks(DEFAULT_TASKS); // Save the default tasks
+
     await saveTags(DEFAULT_TAGS);
 
+    await initTasks();
     await refreshTaskList();
+  }
+
+  async function initTasks() {
+    await saveTasks(DEFAULT_TASKS); // Save the default tasks
+    for (const task of DEFAULT_TASKS) {
+      if (task.tags.length > 0) {
+        const tagsIds = task.tags.map((value) => value.id);
+        await saveTaskTags(task.id, tagsIds);
+      }
+    }
   }
 
   // Check Todo Database
@@ -61,10 +77,7 @@ function TodoApp() {
     try {
       const hasLaunched = await getData(HAS_LAUNCHED); // Check if it is the first app launch
 
-      if (
-        // false &&
-        hasLaunched
-      ) {
+      if (hasLaunched) {
         // Get the saved data
         await refreshTaskList();
       } else {

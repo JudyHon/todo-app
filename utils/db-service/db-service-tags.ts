@@ -1,4 +1,4 @@
-import { openDatabaseAsync, SQLiteDatabase } from "expo-sqlite";
+import { getDBConnection } from "./db-service-helper";
 import ITag from "../../route/TodoApp/models/tag.model";
 
 /**
@@ -14,13 +14,6 @@ import ITag from "../../route/TodoApp/models/tag.model";
  */
 
 const tableName = "tags";
-
-export async function getDBConnection(): Promise<SQLiteDatabase> {
-  const db = await openDatabaseAsync("todo-data.db", {
-    useNewConnection: true,
-  });
-  return db;
-}
 
 export async function createTable(): Promise<void> {
   const db = await getDBConnection();

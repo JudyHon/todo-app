@@ -1,6 +1,10 @@
-import { openDatabaseAsync, SQLiteDatabase } from "expo-sqlite";
 import ITodo from "../../route/TodoApp/models/todo.model";
 import ITag from "../../route/TodoApp/models/tag.model";
+import {
+  disableForeignKeys,
+  enableForeignKeys,
+  getDBConnection,
+} from "./db-service-helper";
 
 /**
  * Schema
@@ -17,17 +21,9 @@ import ITag from "../../route/TodoApp/models/tag.model";
 
 const tableName = "tasks";
 
-export async function getDBConnection(): Promise<SQLiteDatabase> {
-  const db = await openDatabaseAsync("todo-data.db", {
-    useNewConnection: true,
-  });
-  return db;
-}
-
 export async function createTable(): Promise<void> {
   const db = await getDBConnection();
   const query = `
-    PRAGMA foreign_keys = ON;
     CREATE TABLE IF NOT EXISTS ${tableName} (
       id INTEGER PRIMARY KEY NOT NULL,
       name TEXT NOT NULL,
@@ -46,12 +42,12 @@ export async function getItemByID(id: number): Promise<ITodo | null> {
   const db = await getDBConnection();
   try {
     const result: ITodo | null = await db.getFirstAsync(`
-            SELECT 
-                id, name, completed
-            FROM
-                ${tableName}
-            WHERE id = ${id}
-        `);
+      SELECT 
+          id, name, completed
+      FROM
+          ${tableName}
+      WHERE id = ${id}
+    `);
     return result;
   } catch (error) {
     console.error(error);
@@ -112,18 +108,25 @@ export async function getLastInsertId(): Promise<number> {
 
 export async function saveItems(todoItems: ITodo[]): Promise<void> {
   const db = await getDBConnection();
+  await disableForeignKeys(db);
   const insertQuery =
-    `INSERT OR REPLACE INTO ${tableName}( id, name, completed ) VALUES` +
+    `
+    INSERT OR REPLACE INTO ${tableName}( id, name, completed ) VALUES` +
     todoItems
       .map((i) => `('${i.id}', '${i.name}', '${i.completed}')`)
       .join(",");
 
-  await db.runAsync(insertQuery);
+  await db.execAsync(insertQuery);
+
+  await enableForeignKeys(db);
 }
 
 export async function deleteItem(id: number): Promise<void> {
   const db = await getDBConnection();
-  const deleteQuery = `DELETE from ${tableName} where id = ${id}`;
+  const deleteQuery = `
+    DELETE FROM ${tableName}
+    WHERE id = ${id}
+  `;
   await db.runAsync(deleteQuery);
 }
 

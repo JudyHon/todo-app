@@ -43,7 +43,7 @@ function Tag(props: ITagProps) {
   }
 
   return (
-    <Pressable onPress={toggleTag}>
+    <Pressable onPress={toggleTag} disabled={!onPress}>
       <View
         style={[
           styles.container,

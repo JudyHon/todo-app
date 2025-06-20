@@ -1,6 +1,6 @@
 import { openDatabaseAsync, SQLiteDatabase } from "expo-sqlite";
-import ITag from "../../route/TodoApp/models/tag.model";
 import ITaskTags from "../../route/TodoApp/models/task-tags.model";
+import { getDBConnection } from "./db-service-helper";
 
 /**
  * Schema
@@ -15,13 +15,6 @@ import ITaskTags from "../../route/TodoApp/models/task-tags.model";
  */
 
 const tableName = "tasks_tag";
-
-export async function getDBConnection(): Promise<SQLiteDatabase> {
-  const db = await openDatabaseAsync("todo-data.db", {
-    useNewConnection: true,
-  });
-  return db;
-}
 
 export async function createTable(): Promise<void> {
   const db = await getDBConnection();
@@ -38,14 +31,14 @@ export async function createTable(): Promise<void> {
   await db.runAsync(query);
 }
 
-export async function getItems(): Promise<ITag[]> {
+export async function getAllItems(): Promise<ITaskTags[]> {
   const db = await getDBConnection();
 
   try {
-    const items: ITag[] = [];
-    const results: ITag[] = await db.getAllAsync(`
+    const items: ITaskTags[] = [];
+    const results: ITaskTags[] = await db.getAllAsync(`
       SELECT
-          id, name, color
+          task_id, tag_id
       FROM
           ${tableName}
     `);

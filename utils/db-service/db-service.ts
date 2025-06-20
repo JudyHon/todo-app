@@ -25,7 +25,6 @@ export async function saveTasks(tasks: ITodo[]): Promise<void> {
 
 export async function getAllTasks(): Promise<ITodo[]> {
   const results = await TaskDBService.getAllItems();
-  console.log(results);
   return results;
 }
 
@@ -67,4 +66,10 @@ export async function saveTaskTags(
   if (tags_ids.length > 0) {
     await TaskTagsDBService.saveItems(task_id, tags_ids);
   }
+}
+
+// Debug Purpose
+export async function getAllTaskTags(): Promise<ITaskTags[]> {
+  const results = await TaskTagsDBService.getAllItems();
+  return results;
 }

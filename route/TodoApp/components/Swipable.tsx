@@ -49,7 +49,7 @@ const Swipable: React.FC<ISwipable> = ({ onRemove, children }) => {
 
       const isHorizontalPanning = xDiff > yDiff;
 
-      const isClick = xDiff < 0.5 && yDiff < 0.5;
+      const isClick = xDiff < 0.2 && yDiff < 0.2;
 
       const timeToCheck = Date.now() - initialTouch.value.time;
 
