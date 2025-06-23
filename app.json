@@ -20,7 +20,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.tszching.todoapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -42,6 +43,11 @@
           }
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "7ddbe039-2f2d-491e-8e61-5dcce94033cc"
+      }
+    }
   }
 }
