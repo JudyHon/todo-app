@@ -1,6 +1,5 @@
 # Todo App
-A simple Todo application built with **React Native** and **SQLite**.\
-It supports tags, and smooth animation using **Reanimated** and **Gesture Handler**.
+A simple Todo application built with **React Native** and **SQLite**. It supports tags, and smooth animation using **Reanimated** and **Gesture Handler**.
 
 # Features
 * Add, edit, and delete tasks
@@ -9,8 +8,11 @@ It supports tags, and smooth animation using **Reanimated** and **Gesture Handle
 * Smooth add/delete animations
 * SQLite for local persistent storage
 
+# Demonstration
+https://github.com/user-attachments/assets/90dc3b49-5a35-42fb-993f-fdb8c54f1191
+
 # Database Schema
-![alt text](screenshots\database_schema.png)
+![database_schema](https://github.com/user-attachments/assets/d404c8c4-3690-4a15-a9d2-4b3a2d481e1a)
 
 # Installation
 ```bash
