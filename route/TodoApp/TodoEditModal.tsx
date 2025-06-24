@@ -29,6 +29,8 @@ import ITag from "./models/tag.model";
 import { getAllTags } from "../../utils/db-service/db-service";
 import TagModal from "./TagModal";
 import IconButton from "../../components/IconButton";
+import CheckBox from "../../components/CheckBox";
+import MultiTextInput from "./components/MultiTextInput";
 
 interface ITodoEditModalProps {
   isVisible: boolean;
@@ -43,12 +45,14 @@ function TodoEditModal({
   onSave,
   onRefresh,
 }: ITodoEditModalProps) {
-  const [text, setText] = useState<string>("");
   const [tags, setTags] = useState<ITag[]>([]);
 
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
 
   const [showTags, setShowTags] = useState<boolean>(false);
+
+  const [mainTask, setMainTask] = useState<string>("");
+  const [totalTextInput, setTotalTextInput] = useState<string[]>([]);
 
   // Check Tag Database
   const getTagsCallback = useCallback(async function () {
@@ -68,8 +72,8 @@ function TodoEditModal({
   );
 
   async function addTask() {
-    await onSave(text.trim(), selectedTagIds);
-    setText("");
+    await onSave(mainTask.trim(), selectedTagIds);
+    setMainTask("");
     setSelectedTagIds([]);
     onClose();
   }
@@ -133,12 +137,11 @@ function TodoEditModal({
               onPress={onClose}
             />
             <View style={styles.inputContainer}>
-              <TextInput
-                value={text}
-                onChangeText={setText}
-                placeholder="Write a new task..."
-                placeholderTextColor={"#ccc"}
-                style={styles.inputText}
+              <MultiTextInput
+                mainTask={mainTask}
+                setMainTask={setMainTask}
+                totalTextInput={totalTextInput}
+                setTotalTextInput={setTotalTextInput}
               />
             </View>
             <GestureHandlerRootView
@@ -181,7 +184,7 @@ function TodoEditModal({
                 title="Save"
                 color={COLORS.blackLight}
                 containerStyle={styles.buttonContainer}
-                disabled={!text.trim()}
+                disabled={!mainTask.trim()}
                 onPress={addTask}
               />
             </View>
@@ -208,6 +211,10 @@ const styles = StyleSheet.create({
   inputText: {
     fontWeight: FONT_WEIGHTS.medium,
     fontSize: FONT_SIZES.xxl,
+  },
+  inputSubTaskText: {
+    fontWeight: FONT_WEIGHTS.medium,
+    fontSize: FONT_SIZES.md,
   },
   inputContainer: {
     flex: 1,

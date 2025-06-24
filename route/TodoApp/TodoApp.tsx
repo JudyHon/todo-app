@@ -17,6 +17,7 @@ import TodoEditModal from "./TodoEditModal";
 import Button from "../../components/Button";
 import {
   createTables,
+  deleteTables,
   deleteTask,
   getAllTasks,
   getLastInsertTaskId,
@@ -76,7 +77,7 @@ function TodoApp() {
     try {
       const hasLaunched = await getData(HAS_LAUNCHED); // Check if it is the first app launch
 
-      if (hasLaunched) {
+      if (false && hasLaunched) {
         // Get the saved data
         await refreshTaskList();
       } else {

@@ -30,7 +30,11 @@ function TodoItem(props: ITodoProps) {
     <Swipable onRemove={deleteTask}>
       <View style={styles.todoContainer}>
         <Pressable onPress={toggleCompleted} style={styles.todoInner}>
-          <CheckBox checked={task.completed === 1} onPress={toggleCompleted} />
+          <CheckBox
+            checked={task.completed === 1}
+            onPress={toggleCompleted}
+            containerStyle={{ paddingHorizontal: SPACING.md }}
+          />
           <View style={[commonStyles.grow, { gap: SPACING.sm }]}>
             <BodyText
               style={[

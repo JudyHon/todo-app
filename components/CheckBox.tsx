@@ -1,22 +1,19 @@
 import React from "react";
-import {
-  View,
-  StyleSheet,
-  ViewStyle,
-  Pressable,
-} from "react-native";
+import { View, StyleSheet, ViewStyle, Pressable } from "react-native";
 import Icon from "../components/Icon";
 import {
   BORDER_RADIUS,
   COLORS,
   FONT_SIZES,
   FONT_WEIGHTS,
+  HEIGHT,
   ICON_SIZES,
   SPACING,
+  WIDTH,
 } from "../utils/theme";
 
 interface ICheckBoxProps {
-  onPress: () => void;
+  onPress?: () => void;
   checked: boolean;
   containerStyle?: ViewStyle;
   borderRadius?: number;
@@ -41,11 +38,7 @@ function CheckBox(props: ICheckBoxProps) {
     <View style={containerStyle}>
       <Pressable
         onPress={onPress}
-        style={[
-          styles.checkBoxContainer,
-          disabled && { backgroundColor: COLORS.disableBackground },
-          { borderRadius },
-        ]}
+        style={[styles.checkBoxContainer, { borderRadius }]}
         disabled={disabled}
       >
         <View
@@ -54,7 +47,9 @@ function CheckBox(props: ICheckBoxProps) {
             checked ? styles.checked : styles.unchecked,
           ]}
         >
-          <Icon name="check" size={18} color={COLORS.white} />
+          {checked && (
+            <Icon name="check" size={ICON_SIZES.xs} color={COLORS.white} />
+          )}
         </View>
       </Pressable>
     </View>
@@ -63,12 +58,14 @@ function CheckBox(props: ICheckBoxProps) {
 
 const styles = StyleSheet.create({
   checkBoxContainer: {
-    paddingHorizontal: SPACING.md,
+    // paddingHorizontal: SPACING.md,
   },
   checkBoxWrapper: {
     padding: 2,
     borderRadius: BORDER_RADIUS.sm,
     borderWidth: 2,
+    width: WIDTH.md,
+    height: HEIGHT.md,
   },
   checked: {
     borderColor: COLORS.greyLight,
