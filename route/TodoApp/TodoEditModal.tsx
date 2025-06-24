@@ -123,7 +123,7 @@ function TodoEditModal({
             <TagModal
               isVisible={showTags}
               onClose={closeTags}
-              onSelect={() => {}}
+              onSelect={selectTag}
               onRefresh={refreshTagList}
             />
             <IconButton

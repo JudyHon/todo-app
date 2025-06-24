@@ -30,7 +30,7 @@ import IconButton from "../../components/IconButton";
 interface ITagModalProps {
   isVisible: boolean;
   onClose: () => void;
-  onSelect: () => void;
+  onSelect: (tagId: number) => void;
   onRefresh: () => void;
 }
 
@@ -77,6 +77,11 @@ function TagModal({ isVisible, onClose, onSelect, onRefresh }: ITagModalProps) {
     refreshTagList();
   }
 
+  function selectTag(tagId: number) {
+    onSelect(tagId);
+    onClose();
+  }
+
   return (
     <Modal
       animationType="slide"
@@ -87,14 +92,17 @@ function TagModal({ isVisible, onClose, onSelect, onRefresh }: ITagModalProps) {
       transparent
     >
       <SafeAreaView style={styles.modalContainer}>
-        <TouchableWithoutFeedback onPressOut={Keyboard.dismiss}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <KeyboardAvoidingView style={styles.modalWrapper}>
             <View style={styles.modalInner}>
               <View style={styles.titleContainer}>
                 <Subheading>All Tags</Subheading>
                 <IconButton icon="x" onPress={onClose} />
               </View>
-              <ScrollView style={commonStyles.grow}>
+              <ScrollView
+                style={commonStyles.grow}
+                keyboardShouldPersistTaps="always"
+              >
                 <View style={styles.tagsContainer}>
                   {tags.map((tag) => (
                     <View key={tag.id} style={styles.tag}>
@@ -103,7 +111,7 @@ function TagModal({ isVisible, onClose, onSelect, onRefresh }: ITagModalProps) {
                         tagName={tag.name}
                         color={tag.color}
                         active
-                        onPress={onSelect}
+                        onPress={selectTag}
                       />
                       <IconButton
                         onPress={() => {
