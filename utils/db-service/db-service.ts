@@ -25,6 +25,7 @@ export async function saveTasks(tasks: ITodo[]): Promise<void> {
 
 export async function getAllTasks(): Promise<ITodo[]> {
   const results = await TaskDBService.getAllItems();
+  console.log(results);
   return results;
 }
 

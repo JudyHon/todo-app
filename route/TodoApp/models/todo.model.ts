@@ -5,6 +5,7 @@ interface ITodo {
   name: string;
   completed: number;
   tags?: ITag[];
+  subTask?: [];
 }
 
 export default ITodo;

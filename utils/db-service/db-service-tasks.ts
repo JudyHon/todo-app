@@ -5,6 +5,7 @@ import {
   enableForeignKeys,
   getDBConnection,
 } from "./db-service-helper";
+import ISubTask from "../../route/TodoApp/models/sub-task.model";
 
 /**
  * Schema
@@ -40,6 +41,7 @@ export async function createTable(): Promise<void> {
 
 export async function getItemByID(id: number): Promise<ITodo | null> {
   const db = await getDBConnection();
+
   try {
     const result: ITodo | null = await db.getFirstAsync(`
       SELECT 
@@ -57,36 +59,85 @@ export async function getItemByID(id: number): Promise<ITodo | null> {
 
 export async function getAllItems(): Promise<ITodo[]> {
   const db = await getDBConnection();
-  try {
-    const items: ITodo[] = [];
-    const results: Array<any> = await db.getAllAsync(`
-      SELECT 
-        tasks.id,
-        tasks.name,
-        tasks.completed,
-        tasks.due_date,
-        json_group_array(
-          CASE
-            WHEN tags.id IS NOT NULL
-            THEN json_object('id', tags.id, 'name', tags.name, 'color', tags.color)
-          END
-          ) AS tags
-      FROM
-          ${tableName}
-      LEFT JOIN tasks_tag ON tasks.id = tasks_tag.task_id
-      LEFT JOIN tags ON tags.id = tasks_tag.tag_id
-      GROUP BY tasks.id
-      ORDER BY task_id DESC
-    `);
 
-    for (const result of results) {
-      const rawTags = JSON.parse(result.tags);
-      const tags = rawTags.filter((tag: ITag | null) => tag !== null);
-      const parsedResult = { ...result, tags };
-      items.push(parsedResult);
+  try {
+    const mainTasksQuery = `
+      SELECT id, name, completed
+      FROM tasks
+      WHERE parent_id IS NULL
+      ORDER BY id DESC
+    `;
+    const subTasksQuery = `
+      SELECT id, name, completed, parent_id
+      FROM tasks
+      WHERE parent_id IS NOT NULL
+    `;
+    const taskTagsQuery = `
+      SELECT
+       tasks_tag.task_id,
+       tags.id AS tag_id,
+       tags.name,
+       tags.color
+      FROM tasks_tag
+      JOIN tags ON tasks_tag.tag_id = tags.id
+    `;
+
+    interface IMainTask {
+      id: number;
+      name: string;
+      completed: number;
     }
-    items.sort((a, b) => b.id - a.id);
-    return items;
+
+    interface ITaskTags {
+      task_id: number;
+      tag_id: number;
+      name: string;
+      color: string;
+    }
+
+    const mainTasks: IMainTask[] = await db.getAllAsync(mainTasksQuery);
+    const subTasks: ISubTask[] = await db.getAllAsync(subTasksQuery);
+    const taskTags: ITaskTags[] = await db.getAllAsync(taskTagsQuery);
+
+    // === Build subTask Map
+    interface ISubTaskMap {
+      [key: string]: ISubTask[];
+    }
+
+    const subTaskMap: ISubTaskMap = {};
+    subTasks.forEach((subTask) => {
+      if (!subTaskMap[subTask.parent_id]) {
+        subTaskMap[subTask.parent_id] = [];
+      }
+      subTaskMap[subTask.parent_id].push(subTask);
+    });
+
+    // === Build tag Map ===
+
+    interface ITagMap {
+      [key: string]: ITag[];
+    }
+
+    const tagMap: ITagMap = {};
+    taskTags.forEach((tag) => {
+      if (!tagMap[tag.task_id]) {
+        tagMap[tag.task_id] = [];
+      }
+      tagMap[tag.task_id].push({
+        id: tag.task_id,
+        name: tag.name,
+        color: tag.color,
+      });
+    });
+
+    // === Group all main tasks ===
+    const allTasks = mainTasks.map((task) => ({
+      ...task,
+      subtasks: subTaskMap[task.id] || [],
+      tags: tagMap[task.id] || [],
+    }));
+
+    return allTasks;
   } catch (error) {
     console.error(error);
     throw Error("Failed to get items !!!");
@@ -106,7 +157,10 @@ export async function getLastInsertId(): Promise<number> {
   return result ? result?.max_id : 0;
 }
 
-export async function saveItems(todoItems: ITodo[]): Promise<void> {
+export async function saveItems(
+  todoItems: ITodo[],
+  subTasks?: ISubTask[]
+): Promise<void> {
   const db = await getDBConnection();
   await disableForeignKeys(db);
   const insertQuery =
@@ -117,6 +171,20 @@ export async function saveItems(todoItems: ITodo[]): Promise<void> {
       .join(",");
 
   await db.execAsync(insertQuery);
+
+  const parent_id = todoItems[0].id;
+
+  if (subTasks) {
+    const query =
+      `
+      INSERT OR REPLACE INTO ${tableName}( id, name, completed, parent_id ) VALUES` +
+      subTasks
+        .map(
+          (i) => `('${i.id}', '${i.name}', '${i.completed}', '${parent_id}')`
+        )
+        .join(",");
+    await db.execAsync(query);
+  }
 
   await enableForeignKeys(db);
 }
