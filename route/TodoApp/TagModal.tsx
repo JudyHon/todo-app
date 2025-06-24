@@ -14,7 +14,12 @@ import { BORDER_RADIUS, COLORS, ICON_SIZES, SPACING } from "../../utils/theme";
 import { Subheading } from "../../components/StyleText";
 import ITag from "./models/tag.model";
 import { useCallback, useEffect, useState } from "react";
-import { getAllTags } from "../../utils/db-service/db-service";
+import {
+  deleteTag,
+  getAllTags,
+  getLastInsertTagId,
+  saveTags,
+} from "../../utils/db-service/db-service";
 import Tag from "./components/Tag";
 import { COLORS_COMBINATION } from "./constants/tags-color-constant";
 import { normalize } from "../../utils/dimensionUtil";
@@ -25,28 +30,21 @@ import IconButton from "../../components/IconButton";
 interface ITagModalProps {
   isVisible: boolean;
   onClose: () => void;
-  onAdd: () => void;
-  onDelete: () => void;
   onSelect: () => void;
+  onRefresh: () => void;
 }
 
-function TagModal({
-  isVisible,
-  onClose,
-  onAdd,
-  onSelect,
-  onDelete,
-}: ITagModalProps) {
+function TagModal({ isVisible, onClose, onSelect, onRefresh }: ITagModalProps) {
   const [tags, setTags] = useState<ITag[]>([]);
   const [selectedColor, setSelectedColor] = useState<string>(
     COLORS_COMBINATION[0].name
   );
+  const [newTagName, setNewTagName] = useState<string>("");
 
   // Check Todo Database
   const getTagsCallback = useCallback(async function () {
     try {
-      const tags = await getAllTags();
-      setTags(tags);
+      await refreshTagList();
     } catch (error) {
       console.error(error);
     }
@@ -58,6 +56,26 @@ function TagModal({
     },
     [getTagsCallback]
   );
+
+  async function addTag() {
+    const newId = (await getLastInsertTagId()) + 1;
+    const newTag: ITag = { id: newId, name: newTagName, color: selectedColor };
+    await saveTags([newTag]);
+
+    await refreshTagList();
+    setNewTagName("");
+  }
+
+  async function refreshTagList(): Promise<void> {
+    const tagList = await getAllTags();
+    onRefresh();
+    setTags(tagList);
+  }
+
+  async function removeTag(id: number) {
+    await deleteTag(id);
+    refreshTagList();
+  }
 
   return (
     <Modal
@@ -88,7 +106,9 @@ function TagModal({
                         onPress={onSelect}
                       />
                       <IconButton
-                        onPress={onDelete}
+                        onPress={() => {
+                          removeTag(tag.id);
+                        }}
                         icon="trash"
                         iconSize={ICON_SIZES.xs}
                       />
@@ -112,8 +132,10 @@ function TagModal({
                 <TextInput
                   placeholder="Add a new tag..."
                   style={styles.textInputContainer}
+                  onChangeText={setNewTagName}
+                  value={newTagName}
                 />
-                <IconButton onPress={onAdd} icon="arrow-up" />
+                <IconButton onPress={addTag} icon="arrow-up" />
               </View>
             </View>
           </KeyboardAvoidingView>

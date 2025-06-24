@@ -34,9 +34,15 @@ interface ITodoEditModalProps {
   isVisible: boolean;
   onClose: () => void;
   onSave: (task_name: string, tags: number[]) => Promise<void>;
+  onRefresh: () => void;
 }
 
-function TodoEditModal({ isVisible, onClose, onSave }: ITodoEditModalProps) {
+function TodoEditModal({
+  isVisible,
+  onClose,
+  onSave,
+  onRefresh,
+}: ITodoEditModalProps) {
   const [text, setText] = useState<string>("");
   const [tags, setTags] = useState<ITag[]>([]);
 
@@ -94,6 +100,12 @@ function TodoEditModal({ isVisible, onClose, onSave }: ITodoEditModalProps) {
     setShowTags(false);
   }
 
+  async function refreshTagList() {
+    const tagList = await getAllTags();
+    setTags(tagList);
+    onRefresh();
+  }
+
   return (
     <Modal
       animationType="fade"
@@ -111,9 +123,8 @@ function TodoEditModal({ isVisible, onClose, onSave }: ITodoEditModalProps) {
             <TagModal
               isVisible={showTags}
               onClose={closeTags}
-              onAdd={() => {}}
-              onDelete={() => {}}
               onSelect={() => {}}
+              onRefresh={refreshTagList}
             />
             <IconButton
               icon="x"

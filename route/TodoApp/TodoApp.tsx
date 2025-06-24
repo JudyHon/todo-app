@@ -17,7 +17,6 @@ import TodoEditModal from "./TodoEditModal";
 import Button from "../../components/Button";
 import {
   createTables,
-  deleteTables,
   deleteTask,
   getAllTasks,
   getLastInsertTaskId,
@@ -26,7 +25,6 @@ import {
   saveTasks,
   saveTaskTags,
 } from "../../utils/db-service/db-service";
-import TagModal from "./TagModal";
 
 const HAS_LAUNCHED = "HAS_LAUNCHED";
 
@@ -173,6 +171,7 @@ function TodoApp() {
             isVisible={showEdit}
             onClose={closeEdit}
             onSave={addTask}
+            onRefresh={refreshTaskList}
           />
         )}
         <Heading>Today</Heading>

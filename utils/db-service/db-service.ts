@@ -53,6 +53,11 @@ export async function getAllTags(): Promise<ITag[]> {
   return results;
 }
 
+export async function getLastInsertTagId(): Promise<number> {
+  const id = await TagDBService.getLastInsertId();
+  return id;
+}
+
 export async function deleteTag(id: number): Promise<void> {
   await TagDBService.deleteItem(id);
 }
