@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, TouchableOpacity, Pressable } from "react-native";
+import { View, StyleSheet, Pressable } from "react-native";
 import ITodo from "../models/todo.model";
 
 import { BodyText } from "../../../components/StyleText";
@@ -57,6 +57,25 @@ function TodoItem(props: ITodoProps) {
             </View>
           </View>
         </Pressable>
+        {/* {task.subtasks?.map((value) => (
+          <Pressable onPress={toggleCompleted} style={styles.todoInner}>
+            <CheckBox
+              checked={task.completed === 1}
+              onPress={toggleCompleted}
+              containerStyle={{ paddingHorizontal: SPACING.md }}
+            />
+            <View style={[commonStyles.grow, { gap: SPACING.sm }]}>
+              <BodyText
+                style={[
+                  styles.todoTitle,
+                  task.completed ? styles.todoCompleted : {},
+                ]}
+              >
+                {task.name}
+              </BodyText>
+            </View>
+          </Pressable>
+        ))} */}
       </View>
     </Swipable>
   );

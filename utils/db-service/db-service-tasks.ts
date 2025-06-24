@@ -5,7 +5,7 @@ import {
   enableForeignKeys,
   getDBConnection,
 } from "./db-service-helper";
-import ISubTask from "../../route/TodoApp/models/sub-task.model";
+import ISubtask from "../../route/TodoApp/models/sub-task.model";
 
 /**
  * Schema
@@ -67,7 +67,7 @@ export async function getAllItems(): Promise<ITodo[]> {
       WHERE parent_id IS NULL
       ORDER BY id DESC
     `;
-    const subTasksQuery = `
+    const subtasksQuery = `
       SELECT id, name, completed, parent_id
       FROM tasks
       WHERE parent_id IS NOT NULL
@@ -96,20 +96,20 @@ export async function getAllItems(): Promise<ITodo[]> {
     }
 
     const mainTasks: IMainTask[] = await db.getAllAsync(mainTasksQuery);
-    const subTasks: ISubTask[] = await db.getAllAsync(subTasksQuery);
+    const subtasks: ISubtask[] = await db.getAllAsync(subtasksQuery);
     const taskTags: ITaskTags[] = await db.getAllAsync(taskTagsQuery);
 
-    // === Build subTask Map
-    interface ISubTaskMap {
-      [key: string]: ISubTask[];
+    // === Build subtask Map
+    interface ISubtaskMap {
+      [key: string]: ISubtask[];
     }
 
-    const subTaskMap: ISubTaskMap = {};
-    subTasks.forEach((subTask) => {
-      if (!subTaskMap[subTask.parent_id]) {
-        subTaskMap[subTask.parent_id] = [];
+    const subtaskMap: ISubtaskMap = {};
+    subtasks.forEach((subtask) => {
+      if (!subtaskMap[subtask.parent_id]) {
+        subtaskMap[subtask.parent_id] = [];
       }
-      subTaskMap[subTask.parent_id].push(subTask);
+      subtaskMap[subtask.parent_id].push(subtask);
     });
 
     // === Build tag Map ===
@@ -133,7 +133,7 @@ export async function getAllItems(): Promise<ITodo[]> {
     // === Group all main tasks ===
     const allTasks = mainTasks.map((task) => ({
       ...task,
-      subtasks: subTaskMap[task.id] || [],
+      subtasks: subtaskMap[task.id] || [],
       tags: tagMap[task.id] || [],
     }));
 
@@ -159,7 +159,7 @@ export async function getLastInsertId(): Promise<number> {
 
 export async function saveItems(
   todoItems: ITodo[],
-  subTasks?: ISubTask[]
+  subtasks?: ISubtask[]
 ): Promise<void> {
   const db = await getDBConnection();
   await disableForeignKeys(db);
@@ -174,11 +174,11 @@ export async function saveItems(
 
   const parent_id = todoItems[0].id;
 
-  if (subTasks && subTasks?.length > 0) {
+  if (subtasks && subtasks?.length > 0) {
     const query =
       `
       INSERT OR REPLACE INTO ${tableName}( id, name, completed, parent_id ) VALUES` +
-      subTasks
+      subtasks
         .map(
           (i) => `('${i.id}', '${i.name}', '${i.completed}', '${parent_id}')`
         )

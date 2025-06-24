@@ -1,8 +1,8 @@
-interface ISubTask {
+interface ISubtask {
   id: number;
   name: string;
   completed: number;
   parent_id: number;
 }
 
-export default ISubTask;
+export default ISubtask;

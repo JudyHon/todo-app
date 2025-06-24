@@ -28,14 +28,14 @@ function MultiTextInput({
     if (text.length > 0) {
       if (totalTextInput.length <= 0) addTextInput();
     } else {
-      const isSubTaskExist = totalTextInput.filter(
+      const isSubtaskExist = totalTextInput.filter(
         (subtask) => subtask.length > 0
       ).length;
-      if (!isSubTaskExist) removeTextInput(); // Remove the subtask section if there is no subtask
+      if (!isSubtaskExist) removeTextInput(); // Remove the subtask section if there is no subtask
     }
   }
 
-  function setSubTasks(text: string, index: number) {
+  function setSubtasks(text: string, index: number) {
     let newTotalTextInput = [...totalTextInput];
     let isRemove = false;
 
@@ -97,11 +97,11 @@ function MultiTextInput({
               <TextInput
                 value={value}
                 onChangeText={(text) => {
-                  setSubTasks(text, index);
+                  setSubtasks(text, index);
                 }}
                 placeholder="Add subtask"
                 placeholderTextColor={"#ccc"}
-                style={styles.inputSubTaskText}
+                style={styles.inputSubtaskText}
               />
             </View>
           );
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     fontWeight: FONT_WEIGHTS.medium,
     fontSize: FONT_SIZES.xxl,
   },
-  inputSubTaskText: {
+  inputSubtaskText: {
     fontWeight: FONT_WEIGHTS.medium,
     fontSize: FONT_SIZES.md,
     width: "100%",

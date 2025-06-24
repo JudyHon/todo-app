@@ -1,3 +1,4 @@
+import ISubtask from "./sub-task.model";
 import ITag from "./tag.model";
 
 interface ITodo {
@@ -5,7 +6,7 @@ interface ITodo {
   name: string;
   completed: number;
   tags?: ITag[];
-  subTask?: [];
+  subtasks?: ISubtask[];
 }
 
 export default ITodo;

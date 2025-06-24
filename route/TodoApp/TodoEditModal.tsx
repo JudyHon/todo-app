@@ -29,7 +29,6 @@ import ITag from "./models/tag.model";
 import { getAllTags } from "../../utils/db-service/db-service";
 import TagModal from "./TagModal";
 import IconButton from "../../components/IconButton";
-import CheckBox from "../../components/CheckBox";
 import MultiTextInput from "./components/MultiTextInput";
 
 interface ITodoEditModalProps {
@@ -220,7 +219,7 @@ const styles = StyleSheet.create({
     fontWeight: FONT_WEIGHTS.medium,
     fontSize: FONT_SIZES.xxl,
   },
-  inputSubTaskText: {
+  inputSubtaskText: {
     fontWeight: FONT_WEIGHTS.medium,
     fontSize: FONT_SIZES.md,
   },
