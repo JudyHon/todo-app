@@ -1,15 +1,14 @@
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Platform,
-  Pressable,
   StyleSheet,
   TextInput,
-  TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Icon from "../../components/Icon";
 import {
   BORDER_RADIUS,
   COLORS,
@@ -28,6 +27,8 @@ import {
 } from "react-native-gesture-handler";
 import ITag from "./models/tag.model";
 import { getAllTags } from "../../utils/db-service/db-service";
+import TagModal from "./TagModal";
+import IconButton from "../../components/IconButton";
 
 interface ITodoEditModalProps {
   isVisible: boolean;
@@ -41,7 +42,9 @@ function TodoEditModal({ isVisible, onClose, onSave }: ITodoEditModalProps) {
 
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
 
-  // Check Todo Database
+  const [showTags, setShowTags] = useState<boolean>(false);
+
+  // Check Tag Database
   const getTagsCallback = useCallback(async function () {
     try {
       const tags = await getAllTags();
@@ -83,6 +86,14 @@ function TodoEditModal({ isVisible, onClose, onSave }: ITodoEditModalProps) {
     else return false;
   }
 
+  function openTags() {
+    setShowTags(true);
+  }
+
+  function closeTags() {
+    setShowTags(false);
+  }
+
   return (
     <Modal
       animationType="fade"
@@ -92,62 +103,79 @@ function TodoEditModal({ isVisible, onClose, onSave }: ITodoEditModalProps) {
       navigationBarTranslucent={true}
     >
       <SafeAreaView style={styles.modalContainer}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={commonStyles.grow}
-        >
-          <Pressable style={commonStyles.alignEnd} onPress={onClose}>
-            <Icon name="x" size={ICON_SIZES.md} />
-          </Pressable>
-          <View style={styles.inputContainer}>
-            <TextInput
-              value={text}
-              onChangeText={setText}
-              placeholder="Write a new task..."
-              placeholderTextColor={"#ccc"}
-              style={styles.inputText}
-            />
-          </View>
-          <GestureHandlerRootView
-            style={{ flexDirection: "row", gap: SPACING.sm }}
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={commonStyles.grow}
           >
-            <Button
-              icon="plus"
-              borderRadius={BORDER_RADIUS.sm}
-              iconStyle={{ fontSize: ICON_SIZES.xs, color: COLORS.grey }}
-              buttonStyle={{ padding: SPACING.xs }}
-              color={COLORS.greyUltraLight}
+            <TagModal
+              isVisible={showTags}
+              onClose={closeTags}
+              onAdd={() => {}}
+              onDelete={() => {}}
+              onSelect={() => {}}
             />
-            <ScrollView horizontal contentContainerStyle={{ gap: SPACING.sm }}>
-              {tags.map((tag) => (
-                <Tag
-                  key={tag.id}
-                  tagId={tag.id}
-                  tagName={tag.name}
-                  color={tag.color}
-                  active={checkSelectedTag(tag.id)}
-                  onPress={selectTag}
-                />
-              ))}
-            </ScrollView>
-          </GestureHandlerRootView>
+            <IconButton
+              icon="x"
+              iconSize={ICON_SIZES.md}
+              style={commonStyles.selfEnd}
+              onPress={onClose}
+            />
+            <View style={styles.inputContainer}>
+              <TextInput
+                value={text}
+                onChangeText={setText}
+                placeholder="Write a new task..."
+                placeholderTextColor={"#ccc"}
+                style={styles.inputText}
+              />
+            </View>
+            <GestureHandlerRootView
+              style={{ flexDirection: "row", gap: SPACING.sm }}
+            >
+              <Button
+                icon="plus"
+                borderRadius={BORDER_RADIUS.sm}
+                iconStyle={{ fontSize: ICON_SIZES.xs, color: COLORS.grey }}
+                buttonStyle={{ padding: SPACING.xs }}
+                color={COLORS.greyUltraLight}
+                onPress={openTags}
+              />
+              <ScrollView
+                horizontal
+                contentContainerStyle={{ gap: SPACING.sm }}
+                keyboardShouldPersistTaps="always"
+              >
+                {tags.map((tag) => (
+                  <Tag
+                    key={tag.id}
+                    tagId={tag.id}
+                    tagName={tag.name}
+                    color={tag.color}
+                    active={checkSelectedTag(tag.id)}
+                    onPress={selectTag}
+                  />
+                ))}
+              </ScrollView>
+            </GestureHandlerRootView>
 
-          <View style={styles.buttonsContainer}>
-            {/* <Button
+            <View style={styles.buttonsContainer}>
+              {/* <Button
               icon="clock"
               color={COLORS.grey}
               iconStyle={{color: COLORS.white}}
               containerStyle={{ paddingVertical: SPACING.md }}
             /> */}
-            <Button
-              title="Save"
-              color={COLORS.blackLight}
-              containerStyle={styles.buttonContainer}
-              disabled={!text.trim()}
-              onPress={addTask}
-            />
-          </View>
-        </KeyboardAvoidingView>
+              <Button
+                title="Save"
+                color={COLORS.blackLight}
+                containerStyle={styles.buttonContainer}
+                disabled={!text.trim()}
+                onPress={addTask}
+              />
+            </View>
+          </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
       </SafeAreaView>
     </Modal>
   );

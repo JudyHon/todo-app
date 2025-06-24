@@ -26,6 +26,7 @@ import {
   saveTasks,
   saveTaskTags,
 } from "../../utils/db-service/db-service";
+import TagModal from "./TagModal";
 
 const HAS_LAUNCHED = "HAS_LAUNCHED";
 

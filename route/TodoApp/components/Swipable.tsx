@@ -17,9 +17,6 @@ interface ISwipable extends PropsWithChildren {
   onRemove: () => void;
 }
 
-const TOUCH_SLOP = 5;
-const TIME_TO_ACTIVATE_PAN = 100;
-
 const Swipable: React.FC<ISwipable> = ({ onRemove, children }) => {
   const swipeTranslateX = useSharedValue(0);
   const initialTouch = useSharedValue<{

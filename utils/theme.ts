@@ -1,7 +1,7 @@
 import { normalize } from "./dimensionUtil";
 
 export const COLORS = {
-  redLight:"#ed2939",
+  redLight: "#ed2939",
   blue: "#7990F8",
   green: "#46CF88",
   purple: "#BC5EAD",
@@ -56,6 +56,24 @@ export const ICON_SIZES = {
   lg: normalize(48),
   xl: normalize(56),
   xxl: normalize(64),
+};
+
+export const WIDTH = {
+  xs: normalize(16),
+  sm: normalize(20),
+  md: normalize(24),
+  lg: normalize(32),
+  xl: normalize(40),
+  xxl: normalize(48),
+};
+
+export const HEIGHT = {
+  xs: normalize(16),
+  sm: normalize(20),
+  md: normalize(24),
+  lg: normalize(32),
+  xl: normalize(40),
+  xxl: normalize(48),
 };
 
 type FontWeight =

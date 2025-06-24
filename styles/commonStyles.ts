@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { SPACING } from "../utils/theme";
 
 // Common flex patterns
 const commonStyles = StyleSheet.create({
@@ -33,6 +34,12 @@ const commonStyles = StyleSheet.create({
   alignEnd: {
     alignItems: "flex-end",
   },
+  selfStart: {
+    alignSelf: "flex-start",
+  },
+  selfEnd: {
+    alignSelf: "flex-end",
+  },
   justifyStart: {
     justifyContent: "flex-start",
   },
@@ -41,6 +48,12 @@ const commonStyles = StyleSheet.create({
   },
   transparentBackground: {
     backgroundColor: "rgba(0,0,0,0)",
+  },
+  gapExtraSmall: {
+    gap: SPACING.xs,
+  },
+  gapSmall: {
+    gap: SPACING.sm,
   },
 });
 
