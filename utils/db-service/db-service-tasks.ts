@@ -124,7 +124,7 @@ export async function getAllItems(): Promise<ITodo[]> {
         tagMap[tag.task_id] = [];
       }
       tagMap[tag.task_id].push({
-        id: tag.task_id,
+        id: tag.tag_id,
         name: tag.name,
         color: tag.color,
       });
@@ -174,7 +174,7 @@ export async function saveItems(
 
   const parent_id = todoItems[0].id;
 
-  if (subTasks) {
+  if (subTasks && subTasks?.length > 0) {
     const query =
       `
       INSERT OR REPLACE INTO ${tableName}( id, name, completed, parent_id ) VALUES` +

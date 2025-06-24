@@ -35,7 +35,11 @@ import MultiTextInput from "./components/MultiTextInput";
 interface ITodoEditModalProps {
   isVisible: boolean;
   onClose: () => void;
-  onSave: (task_name: string, tags: number[]) => Promise<void>;
+  onSave: (
+    task_name: string,
+    tags: number[],
+    subtasks_names: string[]
+  ) => Promise<void>;
   onRefresh: () => void;
 }
 
@@ -72,8 +76,12 @@ function TodoEditModal({
   );
 
   async function addTask() {
-    await onSave(mainTask.trim(), selectedTagIds);
+    const newTotalTextInput = totalTextInput
+      .map((value) => value.trim())
+      .filter((value) => value != "");
+    await onSave(mainTask.trim(), selectedTagIds, newTotalTextInput);
     setMainTask("");
+    setTotalTextInput([]);
     setSelectedTagIds([]);
     onClose();
   }

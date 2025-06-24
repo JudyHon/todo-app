@@ -77,7 +77,9 @@ function TodoApp() {
     try {
       const hasLaunched = await getData(HAS_LAUNCHED); // Check if it is the first app launch
 
-      if (false && hasLaunched) {
+      if (
+        // false &&
+         hasLaunched) {
         // Get the saved data
         await refreshTaskList();
       } else {
@@ -105,13 +107,19 @@ function TodoApp() {
   }
 
   // === Control Tasks ===
-  async function addTask(name: string, tags: number[]) {
+  async function addTask(name: string, tags: number[], subtasks: string[]) {
     try {
-      const new_id = (await getLastInsertTaskId()) + 1;
-      const newTask = [{ id: new_id, name, completed: 0 }];
+      const newId = (await getLastInsertTaskId()) + 1;
+      const newTask = [{ id: newId, name, completed: 0 }];
+      const newSubtasks = subtasks.map((value, index) => ({
+        id: newId + index + 1,
+        name: value,
+        completed: 0,
+        parent_id: newId,
+      }));
 
-      await saveTasks(newTask);
-      await saveTaskTags(new_id, tags);
+      await saveTasks(newTask, newSubtasks);
+      await saveTaskTags(newId, tags);
       await refreshTaskList();
     } catch (error) {
       console.error(error);
