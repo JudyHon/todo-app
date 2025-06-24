@@ -8,6 +8,7 @@ import CheckBox from "../../../components/CheckBox";
 import Swipable from "./Swipable";
 import Tag from "./Tag";
 import commonStyles from "../../../styles/commonStyles";
+import TodoItemContainer from "./TodoItemContainer";
 
 interface ITodoProps {
   task: ITodo;
@@ -18,8 +19,8 @@ interface ITodoProps {
 function TodoItem(props: ITodoProps) {
   const { task } = props;
 
-  function toggleCompleted() {
-    props.toggleCompleted(task.id);
+  function toggleCompleted(id: number) {
+    props.toggleCompleted(id);
   }
 
   function deleteTask() {
@@ -29,53 +30,16 @@ function TodoItem(props: ITodoProps) {
   return (
     <Swipable onRemove={deleteTask}>
       <View style={styles.todoContainer}>
-        <Pressable onPress={toggleCompleted} style={styles.todoInner}>
-          <CheckBox
-            checked={task.completed === 1}
-            onPress={toggleCompleted}
-            containerStyle={{ paddingHorizontal: SPACING.md }}
-          />
-          <View style={[commonStyles.grow, { gap: SPACING.sm }]}>
-            <BodyText
-              style={[
-                styles.todoTitle,
-                task.completed ? styles.todoCompleted : {},
-              ]}
-            >
-              {task.name}
-            </BodyText>
-            <View style={[commonStyles.row, { gap: SPACING.xs }]}>
-              {task.tags?.map((value) => (
-                <Tag
-                  key={value.id}
-                  tagId={value.id}
-                  tagName={value.name}
-                  color={value.color}
-                  active={task.completed === 0}
-                />
-              ))}
-            </View>
-          </View>
-        </Pressable>
-        {/* {task.subtasks?.map((value) => (
-          <Pressable onPress={toggleCompleted} style={styles.todoInner}>
-            <CheckBox
-              checked={task.completed === 1}
-              onPress={toggleCompleted}
-              containerStyle={{ paddingHorizontal: SPACING.md }}
+        <TodoItemContainer task={task} toggleCompleted={toggleCompleted} />
+        <View style={styles.subtaskContainer}>
+          {task.subtasks?.map((subtask) => (
+            <TodoItemContainer
+              key={subtask.id}
+              task={subtask}
+              toggleCompleted={toggleCompleted}
             />
-            <View style={[commonStyles.grow, { gap: SPACING.sm }]}>
-              <BodyText
-                style={[
-                  styles.todoTitle,
-                  task.completed ? styles.todoCompleted : {},
-                ]}
-              >
-                {task.name}
-              </BodyText>
-            </View>
-          </Pressable>
-        ))} */}
+          ))}
+        </View>
       </View>
     </Swipable>
   );
@@ -85,28 +49,18 @@ const styles = StyleSheet.create({
   todoContainer: {
     width: "100%",
     minHeight: 30,
-    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
     paddingVertical: SPACING.md,
     borderBottomWidth: 1,
     borderColor: COLORS.border,
     backgroundColor: COLORS.white,
+    gap: SPACING.md,
   },
-  todoTitle: {
-    flex: 1,
-    color: COLORS.black,
-    fontWeight: FONT_WEIGHTS.medium,
-  },
-  todoInner: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-  todoCompleted: {
-    color: COLORS.greyLight,
-    textDecorationLine: "line-through",
+  subtaskContainer: {
+    paddingLeft: SPACING.xl,
+    width: "100%",
+    gap: SPACING.md,
   },
 });
 
