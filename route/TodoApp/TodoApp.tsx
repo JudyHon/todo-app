@@ -22,7 +22,7 @@ import {
   getAllTasks,
   getLastInsertTaskId,
   saveTags,
-  saveTasks,
+  saveTask,
   saveTaskTags,
   updateTask,
 } from "../../utils/db-service/db-service";
@@ -75,8 +75,8 @@ function TodoApp() {
   }
 
   async function initTasks() {
-    await saveTasks(DEFAULT_TASKS); // Save the default tasks
     for (const task of DEFAULT_TASKS) {
+      await saveTask(task); // Save the default tasks
       if (task.tags.length > 0) {
         const tagsIds = task.tags.map((value) => value.id);
         await saveTaskTags(task.id, tagsIds);
@@ -120,10 +120,24 @@ function TodoApp() {
   }
 
   // === Control Tasks ===
-  async function addTask(name: string, tags: number[], subtasks: string[]) {
+  async function addTask(
+    name: string,
+    tags: number[],
+    subtasks: string[],
+    due_date: Date | null
+  ) {
     try {
       const newId = (await getLastInsertTaskId()) + 1;
-      const newTask = [{ id: newId, name, completed: 0, parent_id: null }];
+      const newDate = due_date
+        ? due_date.toISOString().split("T")[0]
+        : due_date;
+      const newTask = {
+        id: newId,
+        name,
+        completed: 0,
+        parent_id: null,
+        due_date: newDate,
+      };
       const newSubtasks = subtasks.map((value, index) => ({
         id: newId + index + 1,
         name: value,
@@ -131,7 +145,7 @@ function TodoApp() {
         parent_id: newId,
       }));
 
-      await saveTasks(newTask, newSubtasks);
+      await saveTask(newTask, newSubtasks);
       await saveTaskTags(newId, tags);
       await refreshTaskList();
     } catch (error) {
@@ -141,13 +155,6 @@ function TodoApp() {
 
   async function toggleCallback(id: number) {
     try {
-      // const toggledTask = await getTaskById(id);
-      // if (toggledTask) {
-      //   const newTask = {
-      //     ...toggledTask,
-      //     completed: toggledTask.completed ? 0 : 1,
-      //   };
-      //   await saveTasks([newTask]);
       await updateTask(id);
       await refreshTaskList();
     } catch (error) {

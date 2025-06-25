@@ -25,7 +25,7 @@ export async function createTable(): Promise<void> {
       name TEXT NOT NULL,
       completed BOOLEAN NOT NULL DEFAULT 0,
       parent_id INTEGER,
-      due_date TIMESTAMP,
+      due_date TEXT,
       recurrence TEXT,
       FOREIGN KEY (parent_id) REFERENCES tasks(id) ON DELETE CASCADE
     );
@@ -57,7 +57,7 @@ export async function getAllItems(): Promise<ITask[]> {
 
   try {
     const mainTasksQuery = `
-      SELECT id, name, completed
+      SELECT id, name, completed, due_date
       FROM tasks
       WHERE parent_id IS NULL
       ORDER BY id DESC
@@ -164,22 +164,21 @@ export async function updateItem(id: number): Promise<void> {
   await db.execAsync(query);
 }
 
-export async function saveItems(
-  todoItems: ITask[],
+export async function saveItem(
+  todoItem: ITask,
   subtasks?: ITask[]
 ): Promise<void> {
   const db = await getDBConnection();
+console.log(todoItem);
 
   const insertQuery =
     `
-    INSERT INTO ${tableName}( id, name, completed ) VALUES` +
-    todoItems
-      .map((i) => `('${i.id}', '${i.name}', '${i.completed}')`)
-      .join(",");
+    INSERT INTO ${tableName}( id, name, completed, due_date ) VALUES` +
+    `('${todoItem.id}', '${todoItem.name}', '${todoItem.completed}', '${todoItem.due_date}')`;
 
   await db.execAsync(insertQuery);
 
-  const parent_id = todoItems[0].id;
+  const parent_id = todoItem.id;
 
   if (subtasks && subtasks.length > 0) {
     const query =

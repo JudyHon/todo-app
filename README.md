@@ -23,8 +23,8 @@ npm run start
 ```
 
 # Future Improvements
-[ ] Subtasks\
-[ ] Customizable tags\
+[X] Subtasks\
+[X] Customizable tags\
 [ ] Due date\
 [ ] Dark Mode
 

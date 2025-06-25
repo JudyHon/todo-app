@@ -73,28 +73,30 @@ function Button(props: IButtonProps) {
         ]}
         disabled={disabled}
       >
-        {icon && (
-          <Icon
-            name={icon}
-            size={ICON_SIZES.md}
-            style={[
-              styles.icon,
-              iconStyle,
-              disabled && { color: COLORS.disableText },
-            ]}
-          />
-        )}
-        {title && (
-          <Text
-            style={[
-              styles.title,
-              titleStyle,
-              disabled && { color: COLORS.grey },
-            ]}
-          >
-            {title}
-          </Text>
-        )}
+        <View style={{ gap: SPACING.xs }}>
+          {icon && (
+            <Icon
+              name={icon}
+              size={ICON_SIZES.md}
+              style={[
+                styles.icon,
+                iconStyle,
+                disabled && { color: COLORS.disableText },
+              ]}
+            />
+          )}
+          {title && (
+            <Text
+              style={[
+                styles.title,
+                titleStyle,
+                disabled && { color: COLORS.grey },
+              ]}
+            >
+              {title}
+            </Text>
+          )}
+        </View>
       </Pressable>
     </View>
   );
@@ -107,6 +109,8 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.blue,
     borderRadius: BORDER_RADIUS.lg,
     padding: SPACING.md,
+    justifyContent: "center",
+    alignItems: "center",
   },
   title: {
     fontSize: FONT_SIZES.md,

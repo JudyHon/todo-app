@@ -4,6 +4,7 @@ import {
   Modal,
   Platform,
   StyleSheet,
+  Text,
   TextInput,
   TouchableWithoutFeedback,
   View,
@@ -30,6 +31,10 @@ import { getAllTags } from "../../utils/db-service/db-service";
 import TagModal from "./TagModal";
 import IconButton from "../../components/IconButton";
 import MultiTextInput from "./components/MultiTextInput";
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
+import { normalize } from "../../utils/dimensionUtil";
 
 interface ITodoEditModalProps {
   isVisible: boolean;
@@ -37,7 +42,8 @@ interface ITodoEditModalProps {
   onSave: (
     task_name: string,
     tags: number[],
-    subtasks_names: string[]
+    subtasks_names: string[],
+    due_date: Date | null
   ) => Promise<void>;
   onRefresh: () => void;
 }
@@ -78,7 +84,7 @@ function TodoEditModal({
     const newTotalTextInput = totalTextInput
       .map((value) => value.trim())
       .filter((value) => value != "");
-    await onSave(mainTask.trim(), selectedTagIds, newTotalTextInput);
+    await onSave(mainTask.trim(), selectedTagIds, newTotalTextInput, date);
     setMainTask("");
     setTotalTextInput([]);
     setSelectedTagIds([]);
@@ -117,6 +123,25 @@ function TodoEditModal({
     onRefresh();
   }
 
+  const [date, setDate] = useState<Date | null>(null);
+  const [showPicker, setShowPicker] = useState<boolean>(false);
+  const showDatapicker = () => {
+    setShowPicker(true);
+  };
+  function onChangeDate(
+    event: DateTimePickerEvent,
+    selectedDate: Date | undefined
+  ) {
+    const currentDate = selectedDate || new Date(Date.now());
+    setShowPicker(false);
+
+    if (event.type === "set") {
+      setDate(currentDate);
+    } else if (event.type === "dismissed") {
+      setDate(null);
+    }
+  }
+
   return (
     <Modal
       animationType="fade"
@@ -137,6 +162,13 @@ function TodoEditModal({
               onSelect={selectTag}
               onRefresh={refreshTagList}
             />
+            {showPicker && (
+              <DateTimePicker
+                value={date || new Date(Date.now())}
+                onChange={onChangeDate}
+              />
+            )}
+
             <IconButton
               icon="x"
               iconSize={ICON_SIZES.md}
@@ -151,6 +183,7 @@ function TodoEditModal({
                 setTotalTextInput={setTotalTextInput}
               />
             </View>
+
             <GestureHandlerRootView
               style={{ flexDirection: "row", gap: SPACING.sm }}
             >
@@ -181,16 +214,22 @@ function TodoEditModal({
             </GestureHandlerRootView>
 
             <View style={styles.buttonsContainer}>
-              {/* <Button
-              icon="clock"
-              color={COLORS.grey}
-              iconStyle={{color: COLORS.white}}
-              containerStyle={{ paddingVertical: SPACING.md }}
-            /> */}
+              <Button
+                icon="clock"
+                title={date ? date.toLocaleDateString() : ""}
+                color={COLORS.grey}
+                iconStyle={{ color: COLORS.white }}
+                containerStyle={{
+                  width: normalize(110),
+                }}
+                onPress={showDatapicker}
+                titleStyle={{ fontSize: FONT_SIZES.sm }}
+              />
               <Button
                 title="Save"
                 color={COLORS.blackLight}
-                containerStyle={styles.buttonContainer}
+                containerStyle={commonStyles.grow}
+                buttonStyle={commonStyles.grow}
                 disabled={!mainTask.trim()}
                 onPress={addTask}
               />
@@ -210,11 +249,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     padding: SPACING.lg,
   },
-  buttonsContainer: { flexDirection: "row", gap: SPACING.sm },
-  buttonContainer: {
-    paddingVertical: SPACING.md,
-    flex: 1,
+  buttonsContainer: {
+    flexDirection: "row",
+    gap: SPACING.sm,
+    paddingTop: SPACING.md,
   },
+
   inputText: {
     fontWeight: FONT_WEIGHTS.medium,
     fontSize: FONT_SIZES.xxl,
