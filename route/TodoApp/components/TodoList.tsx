@@ -3,22 +3,21 @@ import { StyleSheet, ScrollView } from "react-native";
 import TodoItem from "./TodoItem";
 import ITask from "../models/task.model";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import * as taskHelper from "../utils/taskHelper";
 
 interface ITodoListProps {
   tasks: Array<ITask>;
-  setTasks: (task: Array<ITask>) => void;
-  deleteCallback?: (id: number) => void;
-  toggleCallback?: (id: number) => void;
+  refreshTask: () => void;
 }
 
-function TodoList({ tasks, deleteCallback, toggleCallback }: ITodoListProps) {
+function TodoList({ tasks, refreshTask }: ITodoListProps) {
   // Function to Delete Task
   function deleteTask(id: number) {
-    if (deleteCallback) deleteCallback(id);
+    taskHelper.deleteTask(id, refreshTask);
   }
   // Function to Toggle Task Completion
   function toggleCompleted(id: number) {
-    if (toggleCallback) toggleCallback(id);
+    taskHelper.toggleTask(id, refreshTask);
   }
 
   return (

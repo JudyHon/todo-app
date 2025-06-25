@@ -23,16 +23,12 @@ export async function updateTask(id: number) {
   await TaskDBService.updateItem(id);
 }
 
-export async function saveTask(
-  task: ITask,
-  subtask?: ITask[]
-): Promise<void> {
+export async function saveTask(task: ITask, subtask?: ITask[]): Promise<void> {
   await TaskDBService.saveItem(task, subtask);
 }
 
 export async function getAllTasks(): Promise<ITask[]> {
   const results = await TaskDBService.getAllItems();
-  // console.log(results);
   return results;
 }
 

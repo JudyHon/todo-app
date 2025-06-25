@@ -7,7 +7,7 @@ import {
   SPACING,
 } from "../../../utils/theme";
 
-import { COLORS_COMBINATION } from "../constants/tags-color-constant";
+import { COLORS_COMBINATION } from "../constants/constants";
 
 interface ITagProps {
   tagId: number;

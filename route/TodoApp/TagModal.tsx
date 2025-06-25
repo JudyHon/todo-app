@@ -21,7 +21,7 @@ import {
   saveTags,
 } from "../../utils/db-service/db-service";
 import Tag from "./components/Tag";
-import { COLORS_COMBINATION } from "./constants/tags-color-constant";
+import { COLORS_COMBINATION } from "./constants/constants";
 import { normalize } from "../../utils/dimensionUtil";
 import { KeyboardAvoidingView } from "../../components/KeyboardAvoidingView";
 import TagColorSelectButton from "./components/TagColorSelectButton";

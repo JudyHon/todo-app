@@ -4,8 +4,6 @@ import {
   Modal,
   Platform,
   StyleSheet,
-  Text,
-  TextInput,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
@@ -35,24 +33,18 @@ import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import { normalize } from "../../utils/dimensionUtil";
+import * as taskHelper from "./utils/taskHelper";
 
 interface ITodoEditModalProps {
   isVisible: boolean;
   onClose: () => void;
-  onSave: (
-    task_name: string,
-    tags: number[],
-    subtasks_names: string[],
-    due_date: Date | null
-  ) => Promise<void>;
-  onRefresh: () => void;
+  refreshTask: () => void;
 }
 
 function TodoEditModal({
   isVisible,
   onClose,
-  onSave,
-  onRefresh,
+  refreshTask,
 }: ITodoEditModalProps) {
   const [tags, setTags] = useState<ITag[]>([]);
 
@@ -84,7 +76,14 @@ function TodoEditModal({
     const newTotalTextInput = totalTextInput
       .map((value) => value.trim())
       .filter((value) => value != "");
-    await onSave(mainTask.trim(), selectedTagIds, newTotalTextInput, date);
+
+    await taskHelper.addTask(
+      mainTask.trim(),
+      selectedTagIds,
+      newTotalTextInput,
+      date
+    );
+    refreshTask();
     setMainTask("");
     setTotalTextInput([]);
     setSelectedTagIds([]);
@@ -120,7 +119,7 @@ function TodoEditModal({
   async function refreshTagList() {
     const tagList = await getAllTags();
     setTags(tagList);
-    onRefresh();
+    refreshTask();
   }
 
   const [date, setDate] = useState<Date | null>(null);

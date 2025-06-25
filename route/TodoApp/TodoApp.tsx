@@ -11,79 +11,15 @@ import {
 } from "../../utils/theme";
 
 import ITask from "./models/task.model";
-import ITag from "./models/tag.model";
 import { getData, storeData } from "../../utils/stoageHelper";
 import TodoEditModal from "./TodoEditModal";
 import Button from "../../components/Button";
-import {
-  createTables,
-  deleteTables,
-  deleteTask,
-  getAllTasks,
-  getLastInsertTaskId,
-  saveTags,
-  saveTask,
-  saveTaskTags,
-  updateTask,
-} from "../../utils/db-service/db-service";
+import { getAllTasks } from "../../utils/db-service/db-service";
+import * as taskHelper from "./utils/taskHelper";
 
 const HAS_LAUNCHED = "HAS_LAUNCHED";
 
-const DEFAULT_TAGS: ITag[] = [
-  { id: 1, name: "Health", color: "blue" },
-  { id: 2, name: "Work", color: "green" },
-  { id: 3, name: "Mental Health", color: "purple" },
-  { id: 4, name: "Others", color: "grey" },
-];
-
-const DEFAULT_TASKS = [
-  {
-    id: 1,
-    name: "Doctor Appointment",
-    completed: 1,
-    tags: [],
-    parent_id: null,
-  },
-  {
-    id: 3,
-    name: "Meeting at School",
-    completed: 0,
-    tags: [DEFAULT_TAGS[1]],
-    parent_id: null,
-  },
-];
-
-const testData = Array.from({ length: 15 }, (_: string, i: number) => {
-  const value = i + 1;
-  return {
-    id: value,
-    name: value.toString(),
-    completed: value % 2,
-  };
-});
-
 function TodoApp() {
-  // Init Data
-  async function initData(): Promise<void> {
-    // await deleteTables();
-    await createTables(); // Create all database
-
-    await saveTags(DEFAULT_TAGS);
-
-    await initTasks();
-    await refreshTaskList();
-  }
-
-  async function initTasks() {
-    for (const task of DEFAULT_TASKS) {
-      await saveTask(task); // Save the default tasks
-      if (task.tags.length > 0) {
-        const tagsIds = task.tags.map((value) => value.id);
-        await saveTaskTags(task.id, tagsIds);
-      }
-    }
-  }
-
   // Check Todo Database
   const checkLaunchedCallback = useCallback(async function () {
     try {
@@ -96,7 +32,7 @@ function TodoApp() {
         // Get the saved data
         await refreshTaskList();
       } else {
-        await initData();
+        await taskHelper.initData();
         await storeData(HAS_LAUNCHED, "true");
       }
     } catch (error) {
@@ -117,58 +53,6 @@ function TodoApp() {
   async function refreshTaskList(): Promise<void> {
     const newTasks = await getAllTasks();
     setTasks(newTasks);
-  }
-
-  // === Control Tasks ===
-  async function addTask(
-    name: string,
-    tags: number[],
-    subtasks: string[],
-    due_date: Date | null
-  ) {
-    try {
-      const newId = (await getLastInsertTaskId()) + 1;
-      const newDate = due_date
-        ? due_date.toISOString().split("T")[0]
-        : due_date;
-      const newTask = {
-        id: newId,
-        name,
-        completed: 0,
-        parent_id: null,
-        due_date: newDate,
-      };
-      const newSubtasks = subtasks.map((value, index) => ({
-        id: newId + index + 1,
-        name: value,
-        completed: 0,
-        parent_id: newId,
-      }));
-
-      await saveTask(newTask, newSubtasks);
-      await saveTaskTags(newId, tags);
-      await refreshTaskList();
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  async function toggleCallback(id: number) {
-    try {
-      await updateTask(id);
-      await refreshTaskList();
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  async function deleteCallback(id: number) {
-    try {
-      await deleteTask(id);
-      await refreshTaskList();
-    } catch (error) {
-      console.error(error);
-    }
   }
 
   const [showEdit, setShowEdit] = useState<boolean>(false);
@@ -199,8 +83,7 @@ function TodoApp() {
           <TodoEditModal
             isVisible={showEdit}
             onClose={closeEdit}
-            onSave={addTask}
-            onRefresh={refreshTaskList}
+            refreshTask={refreshTaskList}
           />
         )}
         <Heading>Today</Heading>
@@ -210,12 +93,7 @@ function TodoApp() {
           {getDateString()}
         </Heading>
       </View>
-      <TodoList
-        tasks={tasks}
-        setTasks={setTasks}
-        toggleCallback={toggleCallback}
-        deleteCallback={deleteCallback}
-      />
+      <TodoList tasks={tasks} refreshTask={refreshTaskList} />
       <Button
         containerStyle={commonStyles.alignEnd}
         onPress={openEdit}
