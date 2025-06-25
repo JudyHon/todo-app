@@ -2,13 +2,13 @@ import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import CheckBox from "../../../components/CheckBox";
 import { BodyText } from "../../../components/StyleText";
-import ITodo from "../models/todo.model";
+import ITask from "../models/task.model";
 import commonStyles from "../../../styles/commonStyles";
 import { COLORS, FONT_WEIGHTS, SPACING } from "../../../utils/theme";
 import Tag from "./Tag";
 
 interface ITodoItemContainerProps {
-  task: ITodo;
+  task: ITask;
   toggleCompleted: (id: number) => void;
 }
 

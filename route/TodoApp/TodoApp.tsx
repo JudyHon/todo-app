@@ -10,7 +10,7 @@ import {
   SPACING,
 } from "../../utils/theme";
 
-import ITodo from "./models/todo.model";
+import ITask from "./models/task.model";
 import ITag from "./models/tag.model";
 import { getData, storeData } from "../../utils/stoageHelper";
 import TodoEditModal from "./TodoEditModal";
@@ -21,10 +21,10 @@ import {
   deleteTask,
   getAllTasks,
   getLastInsertTaskId,
-  getTaskById,
   saveTags,
   saveTasks,
   saveTaskTags,
+  updateTask,
 } from "../../utils/db-service/db-service";
 
 const HAS_LAUNCHED = "HAS_LAUNCHED";
@@ -37,8 +37,20 @@ const DEFAULT_TAGS: ITag[] = [
 ];
 
 const DEFAULT_TASKS = [
-  { id: 1, name: "Doctor Appointment", completed: 1, tags: [] },
-  { id: 2, name: "Meeting at School", completed: 0, tags: [DEFAULT_TAGS[1]] },
+  {
+    id: 1,
+    name: "Doctor Appointment",
+    completed: 1,
+    tags: [],
+    parent_id: null,
+  },
+  {
+    id: 3,
+    name: "Meeting at School",
+    completed: 0,
+    tags: [DEFAULT_TAGS[1]],
+    parent_id: null,
+  },
 ];
 
 const testData = Array.from({ length: 15 }, (_: string, i: number) => {
@@ -79,7 +91,8 @@ function TodoApp() {
 
       if (
         // false &&
-         hasLaunched) {
+        hasLaunched
+      ) {
         // Get the saved data
         await refreshTaskList();
       } else {
@@ -99,7 +112,7 @@ function TodoApp() {
   );
 
   // State Hooks
-  const [tasks, setTasks] = useState<ITodo[]>([]);
+  const [tasks, setTasks] = useState<ITask[]>([]);
 
   async function refreshTaskList(): Promise<void> {
     const newTasks = await getAllTasks();
@@ -110,7 +123,7 @@ function TodoApp() {
   async function addTask(name: string, tags: number[], subtasks: string[]) {
     try {
       const newId = (await getLastInsertTaskId()) + 1;
-      const newTask = [{ id: newId, name, completed: 0 }];
+      const newTask = [{ id: newId, name, completed: 0, parent_id: null }];
       const newSubtasks = subtasks.map((value, index) => ({
         id: newId + index + 1,
         name: value,
@@ -128,15 +141,15 @@ function TodoApp() {
 
   async function toggleCallback(id: number) {
     try {
-      const toggledTask = await getTaskById(id);
-      if (toggledTask) {
-        const newTask = {
-          ...toggledTask,
-          completed: toggledTask.completed ? 0 : 1,
-        };
-        await saveTasks([newTask]);
-        await refreshTaskList();
-      }
+      // const toggledTask = await getTaskById(id);
+      // if (toggledTask) {
+      //   const newTask = {
+      //     ...toggledTask,
+      //     completed: toggledTask.completed ? 0 : 1,
+      //   };
+      //   await saveTasks([newTask]);
+      await updateTask(id);
+      await refreshTaskList();
     } catch (error) {
       console.error(error);
     }

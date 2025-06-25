@@ -1,12 +1,12 @@
 import React from "react";
 import { StyleSheet, ScrollView } from "react-native";
 import TodoItem from "./TodoItem";
-import ITodo from "../models/todo.model";
+import ITask from "../models/task.model";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 interface ITodoListProps {
-  tasks: Array<ITodo>;
-  setTasks: (task: Array<ITodo>) => void;
+  tasks: Array<ITask>;
+  setTasks: (task: Array<ITask>) => void;
   deleteCallback?: (id: number) => void;
   toggleCallback?: (id: number) => void;
 }

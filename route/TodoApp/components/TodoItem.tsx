@@ -1,22 +1,18 @@
 import React from "react";
-import { View, StyleSheet, Pressable } from "react-native";
-import ITodo from "../models/todo.model";
+import { View, StyleSheet } from "react-native";
+import ITask from "../models/task.model";
 
-import { BodyText } from "../../../components/StyleText";
-import { COLORS, FONT_WEIGHTS, SPACING } from "../../../utils/theme";
-import CheckBox from "../../../components/CheckBox";
+import { COLORS, SPACING } from "../../../utils/theme";
 import Swipable from "./Swipable";
-import Tag from "./Tag";
-import commonStyles from "../../../styles/commonStyles";
 import TodoItemContainer from "./TodoItemContainer";
 
-interface ITodoProps {
-  task: ITodo;
+interface ITaskProps {
+  task: ITask;
   deleteTask: (id: number) => void;
   toggleCompleted: (id: number) => void;
 }
 
-function TodoItem(props: ITodoProps) {
+function TodoItem(props: ITaskProps) {
   const { task } = props;
 
   function toggleCompleted(id: number) {
@@ -27,19 +23,23 @@ function TodoItem(props: ITodoProps) {
     props.deleteTask(task.id);
   }
 
+  const subtasks = task.subtasks;
+
   return (
     <Swipable onRemove={deleteTask}>
       <View style={styles.todoContainer}>
         <TodoItemContainer task={task} toggleCompleted={toggleCompleted} />
-        <View style={styles.subtaskContainer}>
-          {task.subtasks?.map((subtask) => (
-            <TodoItemContainer
-              key={subtask.id}
-              task={subtask}
-              toggleCompleted={toggleCompleted}
-            />
-          ))}
-        </View>
+        {subtasks!.length > 0 && (
+          <View style={styles.subtaskContainer}>
+            {subtasks?.map((subtask) => (
+              <TodoItemContainer
+                key={subtask.id}
+                task={subtask}
+                toggleCompleted={toggleCompleted}
+              />
+            ))}
+          </View>
+        )}
       </View>
     </Swipable>
   );

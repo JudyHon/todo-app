@@ -1,10 +1,9 @@
 import * as TaskDBService from "./db-service-tasks";
 import * as TagDBService from "./db-service-tags";
 import * as TaskTagsDBService from "./db-service-task-tags";
-import ITodo from "../../route/TodoApp/models/todo.model";
+import ITask from "../../route/TodoApp/models/task.model";
 import ITag from "../../route/TodoApp/models/tag.model";
 import ITaskTags from "../../route/TodoApp/models/task-tags.model";
-import ISubtask from "../../route/TodoApp/models/sub-task.model";
 
 export async function createTables(): Promise<void> {
   await TaskDBService.createTable();
@@ -20,19 +19,23 @@ export async function deleteTables(): Promise<void> {
 
 // === TASK RELATED ===
 
+export async function updateTask(id: number) {
+  await TaskDBService.updateItem(id);
+}
+
 export async function saveTasks(
-  tasks: ITodo[],
-  subtask?: ISubtask[]
+  tasks: ITask[],
+  subtask?: ITask[]
 ): Promise<void> {
   await TaskDBService.saveItems(tasks, subtask);
 }
 
-export async function getAllTasks(): Promise<ITodo[]> {
+export async function getAllTasks(): Promise<ITask[]> {
   const results = await TaskDBService.getAllItems();
   return results;
 }
 
-export async function getTaskById(id: number): Promise<ITodo | null> {
+export async function getTaskById(id: number): Promise<ITask | null> {
   const result = await TaskDBService.getItemByID(id);
   return result;
 }

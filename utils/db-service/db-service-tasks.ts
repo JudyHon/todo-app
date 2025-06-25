@@ -1,11 +1,6 @@
-import ITodo from "../../route/TodoApp/models/todo.model";
+import ITask from "../../route/TodoApp/models/task.model";
 import ITag from "../../route/TodoApp/models/tag.model";
-import {
-  disableForeignKeys,
-  enableForeignKeys,
-  getDBConnection,
-} from "./db-service-helper";
-import ISubtask from "../../route/TodoApp/models/sub-task.model";
+import { getDBConnection } from "./db-service-helper";
 
 /**
  * Schema
@@ -28,7 +23,7 @@ export async function createTable(): Promise<void> {
     CREATE TABLE IF NOT EXISTS ${tableName} (
       id INTEGER PRIMARY KEY NOT NULL,
       name TEXT NOT NULL,
-      completed INTEGER NOT NULL,
+      completed BOOLEAN NOT NULL DEFAULT 0,
       parent_id INTEGER,
       due_date TIMESTAMP,
       recurrence TEXT,
@@ -39,11 +34,11 @@ export async function createTable(): Promise<void> {
   await db.execAsync(query);
 }
 
-export async function getItemByID(id: number): Promise<ITodo | null> {
+export async function getItemByID(id: number): Promise<ITask | null> {
   const db = await getDBConnection();
 
   try {
-    const result: ITodo | null = await db.getFirstAsync(`
+    const result: ITask | null = await db.getFirstAsync(`
       SELECT 
           id, name, completed
       FROM
@@ -57,7 +52,7 @@ export async function getItemByID(id: number): Promise<ITodo | null> {
   }
 }
 
-export async function getAllItems(): Promise<ITodo[]> {
+export async function getAllItems(): Promise<ITask[]> {
   const db = await getDBConnection();
 
   try {
@@ -86,6 +81,7 @@ export async function getAllItems(): Promise<ITodo[]> {
       id: number;
       name: string;
       completed: number;
+      parent_id: number;
     }
 
     interface ITaskTags {
@@ -96,20 +92,21 @@ export async function getAllItems(): Promise<ITodo[]> {
     }
 
     const mainTasks: IMainTask[] = await db.getAllAsync(mainTasksQuery);
-    const subtasks: ISubtask[] = await db.getAllAsync(subtasksQuery);
+    const subtasks: ITask[] = await db.getAllAsync(subtasksQuery);
     const taskTags: ITaskTags[] = await db.getAllAsync(taskTagsQuery);
 
     // === Build subtask Map
     interface ISubtaskMap {
-      [key: string]: ISubtask[];
+      [key: string]: ITask[];
     }
 
     const subtaskMap: ISubtaskMap = {};
     subtasks.forEach((subtask) => {
-      if (!subtaskMap[subtask.parent_id]) {
-        subtaskMap[subtask.parent_id] = [];
+      if (!subtaskMap[subtask.parent_id!]) {
+        subtaskMap[subtask.parent_id!] = [];
       }
-      subtaskMap[subtask.parent_id].push(subtask);
+      subtaskMap[subtask.parent_id!].push(subtask);
+      // }
     });
 
     // === Build tag Map ===
@@ -150,22 +147,32 @@ interface IMaxID {
 export async function getLastInsertId(): Promise<number> {
   const db = await getDBConnection();
   const result = await db.getFirstAsync<IMaxID>(`
-      SELECT MAX(id) AS max_id
-      FROM ${tableName}
-     `);
+    SELECT MAX(id) AS max_id
+    FROM ${tableName}
+  `);
 
   return result ? result?.max_id : 0;
 }
 
+export async function updateItem(id: number): Promise<void> {
+  const db = await getDBConnection();
+  const query = `
+    UPDATE tasks
+    SET completed = NOT completed
+    WHERE id = ${id}
+  `;
+  await db.execAsync(query);
+}
+
 export async function saveItems(
-  todoItems: ITodo[],
-  subtasks?: ISubtask[]
+  todoItems: ITask[],
+  subtasks?: ITask[]
 ): Promise<void> {
   const db = await getDBConnection();
-  await disableForeignKeys(db);
+
   const insertQuery =
     `
-    INSERT OR REPLACE INTO ${tableName}( id, name, completed ) VALUES` +
+    INSERT INTO ${tableName}( id, name, completed ) VALUES` +
     todoItems
       .map((i) => `('${i.id}', '${i.name}', '${i.completed}')`)
       .join(",");
@@ -174,10 +181,10 @@ export async function saveItems(
 
   const parent_id = todoItems[0].id;
 
-  if (subtasks && subtasks?.length > 0) {
+  if (subtasks && subtasks.length > 0) {
     const query =
       `
-      INSERT OR REPLACE INTO ${tableName}( id, name, completed, parent_id ) VALUES` +
+      INSERT INTO ${tableName}( id, name, completed, parent_id ) VALUES` +
       subtasks
         .map(
           (i) => `('${i.id}', '${i.name}', '${i.completed}', '${parent_id}')`
@@ -185,8 +192,6 @@ export async function saveItems(
         .join(",");
     await db.execAsync(query);
   }
-
-  await enableForeignKeys(db);
 }
 
 export async function deleteItem(id: number): Promise<void> {
