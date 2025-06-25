@@ -213,7 +213,7 @@ function TodoEditModal({
             </GestureHandlerRootView>
 
             <View style={styles.buttonsContainer}>
-              <Button
+              {/* <Button
                 icon="clock"
                 title={date ? date.toLocaleDateString() : ""}
                 color={COLORS.grey}
@@ -223,12 +223,11 @@ function TodoEditModal({
                 }}
                 onPress={showDatapicker}
                 titleStyle={{ fontSize: FONT_SIZES.sm }}
-              />
+              /> */}
               <Button
                 title="Save"
                 color={COLORS.blackLight}
                 containerStyle={commonStyles.grow}
-                buttonStyle={commonStyles.grow}
                 disabled={!mainTask.trim()}
                 onPress={addTask}
               />

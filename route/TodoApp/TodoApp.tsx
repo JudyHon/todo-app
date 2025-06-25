@@ -27,14 +27,14 @@ function TodoApp() {
 
       if (
         // false &&
-        hasLaunched
+        !hasLaunched
       ) {
-        // Get the saved data
-        await refreshTaskList();
-      } else {
         await taskHelper.initData();
         await storeData(HAS_LAUNCHED, "true");
       }
+
+      // Get the saved data
+      await refreshTaskList();
     } catch (error) {
       console.error(error);
     }
