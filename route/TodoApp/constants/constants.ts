@@ -22,6 +22,7 @@ export const DEFAULT_TASKS = [
     completed: 1,
     tags: [],
     parent_id: null,
+    due_date: new Date()
   },
   {
     id: 3,
@@ -29,5 +30,15 @@ export const DEFAULT_TASKS = [
     completed: 0,
     tags: [DEFAULT_TAGS[1]],
     parent_id: null,
+    due_date: null
   },
+];
+
+export const CATEGORY_ORDER = [
+  "Today",
+  "Tomorrow",
+  "Upcoming",
+  "No Due Date",
+  "Overdue",
+  "Completed (Past)",
 ];

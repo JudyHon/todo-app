@@ -57,7 +57,16 @@ export async function getAllItems(): Promise<ITask[]> {
 
   try {
     const mainTasksQuery = `
-      SELECT id, name, completed, due_date
+      SELECT id, name, completed, due_date,
+        CASE
+          WHEN due_date IS NULL THEN 'No Due Date'
+          WHEN DATE(due_date) < DATE('now') AND completed = 0 THEN 'Overdue'
+          WHEN DATE(due_date) = DATE('now') THEN 'Today'
+          WHEN DATE(due_date) = DATE('now', '+1 day') THEN 'Tomorrow'
+          WHEN DATE(due_date) > DATE('now', '+1 day') THEN 'Upcoming'
+          WHEN due_date IS NOT NULL AND DATE(due_date) < DATE('now') AND completed = 1 THEN 'Completed (Past)'
+          ELSE 'Other'
+        END AS category
       FROM tasks
       WHERE parent_id IS NULL
       ORDER BY id DESC
@@ -164,21 +173,30 @@ export async function updateItem(id: number): Promise<void> {
   await db.execAsync(query);
 }
 
-export async function saveItem(
-  todoItem: ITask,
-  subtasks?: ITask[]
-): Promise<void> {
+export async function saveItem(task: ITask, subtasks?: ITask[]): Promise<void> {
   const db = await getDBConnection();
-console.log(todoItem);
+  const newDueDate = task.due_date
+    ? task.due_date.toISOString().split("T")[0]
+    : null;
 
-  const insertQuery =
-    `
-    INSERT INTO ${tableName}( id, name, completed, due_date ) VALUES` +
-    `('${todoItem.id}', '${todoItem.name}', '${todoItem.completed}', '${todoItem.due_date}')`;
+  // const insertQuery =
+  //   `
+  //   INSERT INTO ${tableName}( id, name, completed, due_date ) VALUES` +
+  //   `('${task.id}', '${task.name}', '${task.completed}', '${newDueDate}')`;
 
-  await db.execAsync(insertQuery);
+  const insertQuery = `
+    INSERT INTO ${tableName}( id, name, completed, due_date ) VALUES (?, ?, ?, ?)
+  `;
 
-  const parent_id = todoItem.id;
+  await db.runAsync(
+    insertQuery,
+    task.id,
+    task.name,
+    task.completed,
+    newDueDate
+  );
+
+  const parent_id = task.id;
 
   if (subtasks && subtasks.length > 0) {
     const query =

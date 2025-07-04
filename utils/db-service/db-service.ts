@@ -32,6 +32,21 @@ export async function getAllTasks(): Promise<ITask[]> {
   return results;
 }
 
+export async function getAllTasksByDate(): Promise<Record<string, ITask[]>> {
+  const tasks = await TaskDBService.getAllItems();
+  const results: Record<string, ITask[]> = {};
+
+  tasks.forEach((task) => {
+    const category = task.category!;
+    if (!results[category]) {
+      results[category] = [];
+    }
+    results[category].push(task);
+  });
+
+  return results;
+}
+
 export async function getTaskById(id: number): Promise<ITask | null> {
   const result = await TaskDBService.getItemByID(id);
   return result;

@@ -11,13 +11,12 @@ export async function addTask(
 ): Promise<void> {
   try {
     const newId = (await dbService.getLastInsertTaskId()) + 1;
-    const newDate = due_date ? due_date.toISOString().split("T")[0] : due_date;
     const newTask = {
       id: newId,
       name,
       completed: 0,
       parent_id: null,
-      due_date: newDate,
+      due_date
     };
     const newSubtasks = subtasks.map((value, index) => ({
       id: newId + index + 1,
