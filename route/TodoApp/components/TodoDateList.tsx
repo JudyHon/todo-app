@@ -5,7 +5,7 @@ import {
 } from "react-native-gesture-handler";
 import { CATEGORY_ORDER } from "../constants/constants";
 import ITask from "../models/task.model";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { COLORS, FONT_SIZES, ICON_SIZES, SPACING } from "../../../utils/theme";
 import Icon from "../../../components/Icon";
 import { Subheading } from "../../../components/StyleText";
@@ -33,25 +33,36 @@ function TodoDateList({ groupedTasks, refreshTaskList }: ITodoDateListProps) {
     return result;
   }
 
+  function toggleSection(category: string) {
+    setExpandedSections((prev) => ({ ...prev, [category]: !prev[category] }));
+  }
+
   function renderTaskList() {
     if (groupedTasks !== undefined) {
-      return CATEGORY_ORDER.map((category) => {
+      return CATEGORY_ORDER.map((category, index) => {
         const tasks = groupedTasks[category];
         const disabled = tasks === undefined;
+        const isLast = index === CATEGORY_ORDER.length - 1;
+        const isExpanded = expandedSections[category];
+
         return (
           <View
             key={category}
-            style={{ borderBottomWidth: 1, borderColor: COLORS.border }}
+            style={{
+              borderBottomWidth: isLast ? 0 : 1,
+              borderColor: COLORS.border,
+            }}
           >
-            <View
+            <Pressable
               style={{
                 flexDirection: "row",
                 gap: SPACING.sm,
                 padding: SPACING.sm,
               }}
+              onPress={() => toggleSection(category)}
             >
               <Icon
-                name="chevron-down"
+                name={isExpanded ? "chevron-down" : "chevron-right"}
                 size={disabled ? ICON_SIZES.xs : ICON_SIZES.sm}
                 color={disabled ? COLORS.greyLight : COLORS.blackLight}
               />
@@ -64,12 +75,10 @@ function TodoDateList({ groupedTasks, refreshTaskList }: ITodoDateListProps) {
               >
                 {category}
               </Subheading>
-            </View>
-            <View style={{ flex: 1 }}>
-              {tasks && (
-                <TodoList tasks={tasks} refreshTask={refreshTaskList} />
-              )}
-            </View>
+            </Pressable>
+            {tasks && isExpanded && (
+              <TodoList tasks={tasks} refreshTask={refreshTaskList} />
+            )}
           </View>
         );
       });
