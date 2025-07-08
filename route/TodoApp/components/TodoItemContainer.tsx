@@ -24,7 +24,9 @@ function TodoItemContainer({ task, toggleCompleted }: ITodoItemContainerProps) {
         onPress={_toggleCompleted}
         containerStyle={{ paddingHorizontal: SPACING.md }}
       />
-      <View style={[commonStyles.grow, { gap: SPACING.sm }]}>
+      <View
+        style={[commonStyles.grow, { gap: SPACING.sm, flexDirection: "row" }]}
+      >
         <BodyText
           style={[styles.todoTitle, task.completed ? styles.todoCompleted : {}]}
         >

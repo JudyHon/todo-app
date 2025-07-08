@@ -5,6 +5,7 @@ import ITask from "../models/task.model";
 import { COLORS, SPACING } from "../../../utils/theme";
 import Swipable from "./Swipable";
 import TodoItemContainer from "./TodoItemContainer";
+import { normalize } from "../../../utils/dimensionUtil";
 
 interface ITaskProps {
   task: ITask;
@@ -48,11 +49,11 @@ function TodoItem(props: ITaskProps) {
 const styles = StyleSheet.create({
   todoContainer: {
     width: "100%",
-    minHeight: 30,
+    minHeight: normalize(30),
     justifyContent: "space-between",
     alignItems: "flex-start",
-    paddingVertical: SPACING.md,
-    borderBottomWidth: 1,
+    paddingVertical: SPACING.sm,
+    borderBottomWidth: 0,
     borderColor: COLORS.border,
     backgroundColor: COLORS.white,
     gap: SPACING.md,
