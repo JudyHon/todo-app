@@ -5,11 +5,21 @@ import {
 } from "react-native-gesture-handler";
 import { CATEGORY_ORDER } from "../constants/constants";
 import ITask from "../models/task.model";
-import { Pressable, View } from "react-native";
-import { COLORS, FONT_SIZES, ICON_SIZES, SPACING } from "../../../utils/theme";
+import { Pressable, StyleSheet } from "react-native";
+import {
+  COLORS,
+  FONT_SIZES,
+  FONT_WEIGHTS,
+  ICON_SIZES,
+  SPACING,
+} from "../../../utils/theme";
 import Icon from "../../../components/Icon";
-import { Subheading } from "../../../components/StyleText";
+import { BodyText, Subheading } from "../../../components/StyleText";
 import TodoList from "./TodoList";
+import Animated, {
+  LinearTransition,
+  StretchOutY,
+} from "react-native-reanimated";
 
 interface ITodoDateListProps {
   groupedTasks: Record<string, ITask[]>;
@@ -25,14 +35,6 @@ function TodoDateList({ groupedTasks, refreshTaskList }: ITodoDateListProps) {
     Record<string, boolean>
   >(initialExpandnedState);
 
-  function getDateString(): string {
-    const event = new Date();
-    const dateString = event.toDateString();
-    const a = dateString.split(" ");
-    const result = a.slice(1, 3).reverse().join(" ");
-    return result;
-  }
-
   function toggleSection(category: string) {
     setExpandedSections((prev) => ({ ...prev, [category]: !prev[category] }));
   }
@@ -40,25 +42,28 @@ function TodoDateList({ groupedTasks, refreshTaskList }: ITodoDateListProps) {
   function renderTaskList() {
     if (groupedTasks !== undefined) {
       return CATEGORY_ORDER.map((category, index) => {
-        const tasks = groupedTasks[category];
-        const disabled = tasks === undefined;
+        const tasks = groupedTasks[category]; // Get tasks
+        const disabled = tasks === undefined; // Check if tasks is null
         const isLast = index === CATEGORY_ORDER.length - 1;
         const isExpanded = expandedSections[category];
+        const incompletedTaskLength = tasks?.filter(
+          (task) => !task.completed
+        ).length;
 
         return (
-          <View
+          <Animated.View
+            layout={LinearTransition.duration(300)}
+            exiting={StretchOutY.duration(50)}
             key={category}
             style={{
               borderBottomWidth: isLast ? 0 : 1,
               borderColor: COLORS.border,
+              paddingVertical:
+                disabled || !isExpanded ? SPACING.xs : SPACING.sm,
             }}
           >
             <Pressable
-              style={{
-                flexDirection: "row",
-                gap: SPACING.sm,
-                padding: SPACING.sm,
-              }}
+              style={styles.section}
               onPress={() => toggleSection(category)}
             >
               <Icon
@@ -67,19 +72,18 @@ function TodoDateList({ groupedTasks, refreshTaskList }: ITodoDateListProps) {
                 color={disabled ? COLORS.greyLight : COLORS.blackLight}
               />
               <Subheading
-                style={
-                  disabled
-                    ? { color: COLORS.greyLight, fontSize: FONT_SIZES.sm }
-                    : {}
-                }
+                style={disabled ? styles.disabledTitle : styles.title}
               >
                 {category}
               </Subheading>
+              <BodyText style={styles.countText}>
+                {!disabled && `${incompletedTaskLength}`}
+              </BodyText>
             </Pressable>
             {tasks && isExpanded && (
               <TodoList tasks={tasks} refreshTask={refreshTaskList} />
             )}
-          </View>
+          </Animated.View>
         );
       });
     }
@@ -93,3 +97,15 @@ function TodoDateList({ groupedTasks, refreshTaskList }: ITodoDateListProps) {
 }
 
 export default TodoDateList;
+
+const styles = StyleSheet.create({
+  section: {
+    flexDirection: "row",
+    gap: SPACING.sm,
+    padding: SPACING.sm,
+    alignItems: "center",
+  },
+  title: { fontWeight: FONT_WEIGHTS.bold },
+  disabledTitle: { color: COLORS.greyLight, fontSize: FONT_SIZES.sm },
+  countText: { fontSize: FONT_SIZES.sm },
+});

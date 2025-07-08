@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     height: "100%",
     backgroundColor: COLORS.redLight,
   },
-  icon: { alignSelf: "flex-end", padding: SPACING.md },
+  icon: { alignSelf: "flex-end", paddingRight: SPACING.sm },
 });
 
 export default Swipable;

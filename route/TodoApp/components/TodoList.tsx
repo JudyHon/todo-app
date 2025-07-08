@@ -1,9 +1,14 @@
 import React from "react";
-import { StyleSheet, ScrollView } from "react-native";
+import { StyleSheet, View } from "react-native";
 import TodoItem from "./TodoItem";
 import ITask from "../models/task.model";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as taskHelper from "../utils/taskHelper";
+import { COLORS } from "../../../utils/theme";
+import Animated, {
+  LinearTransition,
+  StretchOutY,
+} from "react-native-reanimated";
 
 interface ITodoListProps {
   tasks: Array<ITask>;
@@ -22,16 +27,25 @@ function TodoList({ tasks, refreshTask }: ITodoListProps) {
 
   return (
     <GestureHandlerRootView>
-      <ScrollView style={styles.todoListContainer}>
-        {tasks.map((task) => (
-          <TodoItem
-            key={task.id}
-            task={task}
-            deleteTask={deleteTask}
-            toggleCompleted={toggleCompleted}
-          />
+      <View style={styles.todoListContainer}>
+        {tasks.map((task, index) => (
+          <View key={task.id}>
+            <TodoItem
+              task={task}
+              deleteTask={deleteTask}
+              toggleCompleted={toggleCompleted}
+            />
+            {index !== tasks.length - 1 && (
+              <Animated.View
+                layout={LinearTransition.duration(300)}
+                exiting={StretchOutY.duration(50)}
+              >
+                <View style={styles.border} />
+              </Animated.View>
+            )}
+          </View>
         ))}
-      </ScrollView>
+      </View>
     </GestureHandlerRootView>
   );
 }
@@ -39,6 +53,12 @@ function TodoList({ tasks, refreshTask }: ITodoListProps) {
 const styles = StyleSheet.create({
   todoListContainer: {
     flex: 1,
+  },
+  border: {
+    borderBottomWidth: 1,
+    width: "90%",
+    alignSelf: "center",
+    borderColor: COLORS.border,
   },
 });
 

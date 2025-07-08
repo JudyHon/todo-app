@@ -52,16 +52,14 @@ const styles = StyleSheet.create({
     minHeight: normalize(30),
     justifyContent: "space-between",
     alignItems: "flex-start",
-    paddingVertical: SPACING.sm,
-    borderBottomWidth: 0,
-    borderColor: COLORS.border,
     backgroundColor: COLORS.white,
-    gap: SPACING.md,
+    gap: SPACING.sm,
+    paddingVertical: SPACING.sm,
   },
   subtaskContainer: {
     paddingLeft: SPACING.xl,
     width: "100%",
-    gap: SPACING.md,
+    gap: SPACING.sm,
   },
 });
 

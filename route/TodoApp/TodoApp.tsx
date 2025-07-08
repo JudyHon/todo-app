@@ -2,7 +2,13 @@ import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet, KeyboardAvoidingView, Platform, View } from "react-native";
 import { Subheading } from "../../components/StyleText";
 import commonStyles from "../../styles/commonStyles";
-import { BORDER_RADIUS, COLORS, SPACING } from "../../utils/theme";
+import {
+  BORDER_RADIUS,
+  COLORS,
+  FONT_SIZES,
+  FONT_WEIGHTS,
+  SPACING,
+} from "../../utils/theme";
 
 import ITask from "./models/task.model";
 import { getData, storeData } from "../../utils/stoageHelper";
@@ -59,6 +65,14 @@ function TodoApp() {
     setShowEdit(false);
   }
 
+  function getDateString(): string {
+    const event = new Date();
+    const dateString = event.toDateString();
+    const a = dateString.split(" ");
+    const result = a.slice(1, 3).reverse().join(" ");
+    return result;
+  }
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -78,10 +92,11 @@ function TodoApp() {
           flexDirection: "row",
           gap: SPACING.sm,
           padding: SPACING.sm,
-          justifyContent: "center",
+          alignItems: "center",
         }}
       >
-        <Subheading>ALL TASKS</Subheading>
+        <Subheading style={styles.title}>WELCOME BACK!</Subheading>
+        <Subheading style={styles.dateText}>{getDateString()}</Subheading>
       </View>
       <View style={commonStyles.grow}>
         <TodoDateList
@@ -105,7 +120,6 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 20,
   },
-
   textInputContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -115,6 +129,12 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#ddd",
   },
+  dateText: {
+    fontSize: FONT_SIZES.xl,
+    fontWeight: FONT_WEIGHTS.regular,
+    color: COLORS.grey,
+  },
+  title: { fontSize: FONT_SIZES.xxl },
 });
 
 export default TodoApp;

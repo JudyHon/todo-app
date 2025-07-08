@@ -33,13 +33,11 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.xxxl,
     color: COLORS.text,
     fontWeight: FONT_WEIGHTS.bold,
-    marginBottom: SPACING.sm,
   },
   subheading: {
     fontSize: FONT_SIZES.lg,
     fontWeight: FONT_WEIGHTS.medium,
     color: COLORS.text,
-    marginBottom: SPACING.sm,
   },
   body: {
     fontSize: FONT_SIZES.md,

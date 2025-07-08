@@ -6,9 +6,7 @@ import {
   COLORS,
   FONT_SIZES,
   FONT_WEIGHTS,
-  HEIGHT,
   ICON_SIZES,
-  SPACING,
   WIDTH,
 } from "../utils/theme";
 
@@ -18,6 +16,7 @@ interface ICheckBoxProps {
   containerStyle?: ViewStyle;
   borderRadius?: number;
   disabled?: boolean;
+  size?: number;
 }
 
 const defaultCheckBoxProps: ICheckBoxProps = {
@@ -26,12 +25,13 @@ const defaultCheckBoxProps: ICheckBoxProps = {
   containerStyle: {},
   borderRadius: BORDER_RADIUS.lg,
   disabled: false,
+  size: WIDTH.md,
 };
 
 function CheckBox(props: ICheckBoxProps) {
   const propsWithDefaults = { ...defaultCheckBoxProps, ...props };
 
-  const { containerStyle, borderRadius, disabled, onPress, checked } =
+  const { containerStyle, borderRadius, disabled, onPress, checked, size } =
     propsWithDefaults;
 
   return (
@@ -45,10 +45,11 @@ function CheckBox(props: ICheckBoxProps) {
           style={[
             styles.checkBoxWrapper,
             checked ? styles.checked : styles.unchecked,
+            { width: size, height: size },
           ]}
         >
           {checked && (
-            <Icon name="check" size={ICON_SIZES.xs} color={COLORS.white} />
+            <Icon name="check" size={size! / 1.5} color={COLORS.white} />
           )}
         </View>
       </Pressable>
@@ -57,15 +58,13 @@ function CheckBox(props: ICheckBoxProps) {
 }
 
 const styles = StyleSheet.create({
-  checkBoxContainer: {
-    // paddingHorizontal: SPACING.md,
-  },
+  checkBoxContainer: {},
   checkBoxWrapper: {
     padding: 2,
     borderRadius: BORDER_RADIUS.sm,
     borderWidth: 2,
-    width: WIDTH.md,
-    height: HEIGHT.md,
+    justifyContent: "center",
+    alignItems: "center",
   },
   checked: {
     borderColor: COLORS.greyLight,

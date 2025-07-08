@@ -4,7 +4,13 @@ import CheckBox from "../../../components/CheckBox";
 import { BodyText } from "../../../components/StyleText";
 import ITask from "../models/task.model";
 import commonStyles from "../../../styles/commonStyles";
-import { COLORS, FONT_WEIGHTS, SPACING } from "../../../utils/theme";
+import {
+  COLORS,
+  FONT_SIZES,
+  FONT_WEIGHTS,
+  SPACING,
+  WIDTH,
+} from "../../../utils/theme";
 import Tag from "./Tag";
 
 interface ITodoItemContainerProps {
@@ -23,6 +29,7 @@ function TodoItemContainer({ task, toggleCompleted }: ITodoItemContainerProps) {
         checked={task.completed === 1}
         onPress={_toggleCompleted}
         containerStyle={{ paddingHorizontal: SPACING.md }}
+        size={WIDTH.sm}
       />
       <View
         style={[commonStyles.grow, { gap: SPACING.sm, flexDirection: "row" }]}
@@ -37,7 +44,7 @@ function TodoItemContainer({ task, toggleCompleted }: ITodoItemContainerProps) {
             <Tag
               key={value.id}
               tagId={value.id}
-              tagName={value.name}
+              tagName={value.name.charAt(0)}
               color={value.color}
               active={task.completed === 0}
             />
@@ -55,6 +62,7 @@ const styles = StyleSheet.create({
     flex: 1,
     color: COLORS.black,
     fontWeight: FONT_WEIGHTS.medium,
+    fontSize: FONT_SIZES.sm,
   },
   todoInner: {
     flex: 1,
