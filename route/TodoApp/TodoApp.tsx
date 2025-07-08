@@ -1,7 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { StyleSheet, KeyboardAvoidingView, Platform, View } from "react-native";
+import {
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  View,
+  Text,
+} from "react-native";
 import TodoList from "./components/TodoList";
-import { Heading } from "../../components/StyleText";
+import { Heading, Subheading } from "../../components/StyleText";
 import commonStyles from "../../styles/commonStyles";
 import {
   BORDER_RADIUS,
@@ -14,8 +20,16 @@ import ITask from "./models/task.model";
 import { getData, storeData } from "../../utils/stoageHelper";
 import TodoEditModal from "./TodoEditModal";
 import Button from "../../components/Button";
-import { getAllTasks } from "../../utils/db-service/db-service";
+import {
+  getAllTasks,
+  getAllTasksByDate,
+} from "../../utils/db-service/db-service";
 import * as taskHelper from "./utils/taskHelper";
+import { CATEGORY_ORDER } from "./constants/constants";
+import {
+  GestureHandlerRootView,
+  ScrollView,
+} from "react-native-gesture-handler";
 
 const HAS_LAUNCHED = "HAS_LAUNCHED";
 
@@ -26,7 +40,7 @@ function TodoApp() {
       const hasLaunched = await getData(HAS_LAUNCHED); // Check if it is the first app launch
 
       if (
-        // false &&
+        // true ||
         !hasLaunched
       ) {
         await taskHelper.initData();
@@ -49,10 +63,13 @@ function TodoApp() {
 
   // State Hooks
   const [tasks, setTasks] = useState<ITask[]>([]);
+  const [groupedTasks, setGroupedTasks] = useState<Record<string, ITask[]>>();
 
   async function refreshTaskList(): Promise<void> {
     const newTasks = await getAllTasks();
+    const newGroupedTasks = await getAllTasksByDate();
     setTasks(newTasks);
+    setGroupedTasks(newGroupedTasks);
   }
 
   const [showEdit, setShowEdit] = useState<boolean>(false);
@@ -71,14 +88,38 @@ function TodoApp() {
     return result;
   }
 
+  function renderTaskList() {
+    if (groupedTasks !== undefined) {
+      return CATEGORY_ORDER.map((category) => {
+        const tasks = groupedTasks[category];
+        return (
+          <View key={category}>
+            <View
+              style={{
+                flexDirection: "row",
+                gap: SPACING.sm,
+                padding: SPACING.sm,
+              }}
+            >
+              <Subheading>{category}</Subheading>
+            </View>
+            <View style={{ flex: 1 }}>
+              {tasks && (
+                <TodoList tasks={tasks} refreshTask={refreshTaskList} />
+              )}
+            </View>
+          </View>
+        );
+      });
+    }
+  }
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.todoListContainer}
     >
-      <View
-        style={{ flexDirection: "row", gap: SPACING.sm, padding: SPACING.sm }}
-      >
+      <View>
         {showEdit && (
           <TodoEditModal
             isVisible={showEdit}
@@ -86,14 +127,33 @@ function TodoApp() {
             refreshTask={refreshTaskList}
           />
         )}
-        <Heading>Today</Heading>
-        <Heading
-          style={{ color: COLORS.grey, fontWeight: FONT_WEIGHTS.medium }}
-        >
-          {getDateString()}
-        </Heading>
       </View>
-      <TodoList tasks={tasks} refreshTask={refreshTaskList} />
+      <View
+        style={{
+          flexDirection: "row",
+          gap: SPACING.sm,
+          padding: SPACING.sm,
+          justifyContent: "center",
+        }}
+      >
+        <Subheading>ALL TASKS</Subheading>
+      </View>
+      <View style={commonStyles.grow}>
+        <GestureHandlerRootView>
+          <ScrollView>{renderTaskList()}</ScrollView>
+        </GestureHandlerRootView>
+        {/* <View
+          style={{ flexDirection: "row", gap: SPACING.sm, padding: SPACING.sm }}
+        >
+          <Subheading>Today</Subheading>
+          <Subheading
+            style={{ color: COLORS.grey, fontWeight: FONT_WEIGHTS.medium }}
+          >
+            {getDateString()}
+          </Subheading>
+        </View> */}
+        <TodoList tasks={tasks} refreshTask={refreshTaskList} />
+      </View>
       <Button
         containerStyle={commonStyles.alignEnd}
         onPress={openEdit}
